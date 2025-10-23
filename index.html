@@ -3,213 +3,262 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guardar y Mostrar Nombres en Firestore</title>
-    <!-- 1. LIBRERÍA XLSX (SheetJS) - NECESARIA PARA GENERAR ARCHIVOS .XLSX -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
+    <title>Kallpa 3D - Login</title>
+    
+    <!-- Importamos Font Awesome para el ícono de ojo -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <!-- CSS CONSOLIDADO (site.css + login.css) -->
     <style>
+        /* --- ESTILOS DE SITE.CSS ADAPTADOS --- */
+        
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sharp Grotesk', Arial, sans-serif;
+            
+            /* RUTA DE IMAGEN DE FONDO: Cambia esta URL si la subes a GitHub Pages */
+            /* background-image: url('/img/plaza-de-armas-cajamarca.jpg'); */
+            background-color: #f0f0f0; /* Fondo alternativo si la imagen no carga */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
+            backdrop-filter: blur(1.5px);
+            
+            position: relative; 
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- ESTILOS DE LOGIN.CSS ADAPTADOS --- */
+        .login-box {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 33px;
+            box-shadow: 0 5px 14px rgba(0, 0, 0, 0.2);
+            width: 90%; /* Ajuste para móvil */
+            max-width: 319px;
             text-align: center;
         }
-        input[type="text"], button {
-            padding: 10px;
-            margin: 5px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        button {
-            cursor: pointer;
-            border: none;
-            transition: background-color 0.3s;
-        }
-        #btnGuardar {
-            background-color: #4CAF50; /* Verde */
-            color: white;
-        }
-        #btnGuardar:hover {
-            background-color: #45a049;
-        }
-        #btnExportar {
-            background-color: #008CBA; /* Azul */
-            color: white;
-        }
-        #btnExportar:hover {
-            background-color: #007bb5;
-        }
-        #tablaNombres {
-            width: 80%;
-            margin: 20px auto;
-            border-collapse: collapse;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        #tablaNombres th, #tablaNombres td {
-            padding: 12px;
+
+        form {
             text-align: left;
-            border-bottom: 1px solid #ddd;
         }
-        #tablaNombres th {
-            background-color: #f2f2f2;
-            color: #333;
+
+        .login-header {
+            margin-bottom: 33px;
         }
-        #mensaje {
-            margin-top: 15px;
+
+        .login-logo {
+            /* Si tienes un logo, asegúrate de que esté disponible, o usa un placeholder */
+            content: url('https://placehold.co/150x80/EEEEEE/333333?text=Logo+Kallpa'); 
+            width: 150px;
+            height: auto;
+        }
+
+        .login-box h2 {
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 26px;
+            font-family: 'Sharp Grotesk', sans-serif;
             font-weight: bold;
+        }
+
+        .form-group {
+            width: 100%;
+            margin-bottom: 19px;
+        }
+
+        .form-group label {
+            display: block;
+            text-align: left;
+            margin-bottom: 6px;
+            font-size: 1.1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 17px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1.1rem;
+            font-family: 'Sharp Grotesk', sans-serif;
+            font-weight: 450;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control::placeholder {
+            color: #a0a0a0;
+            font-family: 'Sharp Grotesk', sans-serif;
+            font-weight: 450;
+            letter-spacing: 0.5px;
+        }
+
+        .password-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .password-container .form-control {
+            padding-right: 48px;
+        }
+
+        #togglePassword {
+            position: absolute;
+            right: 17px;
+            top: 60%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #dc3545;
+        }
+
+        .forgot-password {
+            display: block;
+            margin-top: 16px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+            color: #000000;
+            text-decoration: none;
+            font-family: 'Sharp Grotesk', sans-serif;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+            color: #dc3545;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 16px;
+            background-color: #dc3545;
+            color: white;
+            cursor: pointer;
+            font-size: 1.4rem;
+            font-weight: 300;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+            font-family: 'Sharp Grotesk', sans-serif;
+        }
+
+        .login-button:hover {
+            background-color: #c82333;
+        }
+
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 6px;
+            padding: 12px 17px;
+            margin-bottom: 19px;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            font-family: 'Sharp Grotesk', sans-serif;
+            font-weight: 400;
+        }
+        
+        .error-text {
+            flex-grow: 1;
+            text-align: center;
+            font-family: 'Sharp Grotesk', sans-serif;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            color: #721c24;
+            cursor: pointer;
+            padding: 0;
         }
     </style>
 </head>
-<body onload="cargarNombresInicial()">
 
-    <h1>Guardar mi Nombre en Firebase</h1>
-    <input type="text" id="inputNombre" placeholder="Ingresa tu nombre">
-    <button id="btnGuardar" onclick="guardarNombre()">Guardar en DB</button>
-    <p id="mensaje"></p>
+<body>
+    <div class="login-box">
+        <div class="login-header">
+            <div class="login-logo"></div> 
+        </div>
 
-    <h2>Nombres Registrados</h2>
-    <!-- Botón de exportar -->
-    <button id="btnExportar" onclick="exportarTablaAExcel()" style="margin-bottom: 15px;">
-        Descargar a Excel (.XLSX)
-    </button>
-    
-    <table id="tablaNombres">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>ID del Documento</th>
-                <th>Fecha de Registro</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Los datos se insertarán aquí -->
-        </tbody>
-    </table>
-
-    <script type="module">
-        // 1. Importar las funciones necesarias desde el SDK de Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-        // 2. Tu configuración de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyBifMbYtOkxsijnaKlTtl_S_A5dkzE32BM",
-            authDomain: "prueba-ff7bb.firebaseapp.com",
-            projectId: "prueba-ff7bb",
-            storageBucket: "prueba-ff7bb.firebasestorage.app",
-            messagingSenderId: "700600586061",
-            appId: "1:700600586061:web:f1bfae76ae2ff3ed1db104"
-        };
-
-        // 3. Inicializar Firebase y Firestore
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app); 
-        const nombresRef = collection(db, "nombres_registrados");
+        <h2>¡Bienvenido a Kallpa 3D!</h2>
         
-        // Función auxiliar para formatear la fecha
-        const formatDate = (timestamp) => {
-            if (timestamp && timestamp.toDate) {
-                return timestamp.toDate().toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'medium' });
-            }
-            return 'N/A';
-        };
+        <div id="errorContainer" style="display: none;">
+            <!-- El mensaje de error se insertará aquí con JS -->
+        </div>
+        
+        <form id="loginForm" method="post" class="w-100">
+            <div class="form-group">
+                <label for="emailInput">Email</label>
+                <input type="email" id="emailInput" class="form-control" placeholder="Ingresa tu email" required />
+            </div>
 
-        // =================================================================
-        // FUNCIÓN DE LECTURA: Lee y pinta los datos en la tabla
-        // =================================================================
-        async function cargarNombres() {
-            const tbody = document.getElementById('tablaNombres').querySelector('tbody');
-            tbody.innerHTML = '<tr><td colspan="3">Cargando datos...</td></tr>'; 
+            <div class="form-group password-container">
+                <label for="passwordInput">Contraseña</label>
+                <input type="password" id="passwordInput" class="form-control" placeholder="Ingresa tu contraseña" required />
+                <i class="far fa-eye" id="togglePassword"></i>
+            </div>
 
-            try {
-                const q = query(nombresRef, orderBy("fecha", "desc"));
-                const querySnapshot = await getDocs(q);
+            <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
 
-                tbody.innerHTML = '';
+            <button type="submit" class="login-button">Ingresar</button>
+        </form>
+    </div>
 
-                if (querySnapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="3">No hay nombres registrados.</td></tr>';
-                    return;
-                }
-
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const row = tbody.insertRow();
-                    
-                    row.insertCell().textContent = data.nombre;
-                    row.insertCell().textContent = doc.id; 
-                    row.insertCell().textContent = formatDate(data.fecha);
-                });
-
-            } catch (error) {
-                console.error("Error al cargar los nombres: ", error);
-                tbody.innerHTML = '<tr><td colspan="3">❌ Error al conectar con la base de datos.</td></tr>';
-            }
-        }
-
-        // =================================================================
-        // FUNCIÓN DE EXPORTACIÓN (Usando SheetJS para XLSX nativo)
-        // =================================================================
-        window.exportarTablaAExcel = function() {
-            const table = document.getElementById('tablaNombres');
+    <script>
+        const togglePassword = document.querySelector('#togglePassword');
+        const passwordInput = document.querySelector('#passwordInput');
+        const loginForm = document.querySelector('#loginForm');
+        const errorContainer = document.querySelector('#errorContainer');
+        
+        // Función para mostrar el mensaje de error
+        function mostrarError(mensaje) {
+            errorContainer.innerHTML = `
+                <div class="error-message">
+                    <div class="error-text">${mensaje}</div>
+                    <button class="close-btn">&times;</button>
+                </div>
+            `;
+            errorContainer.style.display = 'flex';
             
-            // Comprobación de que la librería XLSX ha cargado
-            if (typeof XLSX === 'undefined') {
-                document.getElementById('mensaje').textContent = "Error: La librería de exportación no ha cargado correctamente.";
-                console.error("XLSX library not found. Check the CDN script tag.");
-                return;
-            }
-
-            // 1. Convertir la tabla HTML (por su ID) a un libro de trabajo (Workbook)
-            const workbook = XLSX.utils.table_to_book(table, { 
-                sheet: "Nombres Registrados", // Nombre de la hoja en Excel
-                raw: false // Intentar parsear las fechas/números automáticamente
+            document.querySelector('.close-btn').addEventListener('click', () => {
+                errorContainer.style.display = 'none';
             });
-
-            // 2. Escribir el archivo XLSX y forzar la descarga
-            const filename = 'nombres_registrados_' + new Date().toISOString().slice(0, 10) + '.xlsx';
-            
-            // XLSX.writeFile se encarga de todo el proceso de descarga y formato
-            XLSX.writeFile(workbook, filename);
-        }
-
-
-        // =================================================================
-        // FUNCIÓN DE ESCRITURA
-        // =================================================================
-        window.guardarNombre = async function() {
-            const nombreInput = document.getElementById('inputNombre');
-            const mensaje = document.getElementById('mensaje');
-            const nombre = nombreInput.value.trim();
-
-            if (nombre === "") {
-                mensaje.textContent = "Por favor, ingresa un nombre.";
-                return;
-            }
-
-            try {
-                const docRef = await addDoc(nombresRef, {
-                    nombre: nombre,
-                    fecha: serverTimestamp() 
-                });
-
-                mensaje.textContent = `¡"${nombre}" guardado! 🎉`;
-                nombreInput.value = '';
-                
-                await cargarNombres(); // Recargar la tabla
-                
-            } catch (error) {
-                console.error("Error al escribir en Firestore: ", error);
-                mensaje.textContent = "❌ Error al guardar. Revisa la consola.";
-            }
         }
         
-        // =================================================================
-        // FUNCIÓN DE INICIO
-        // =================================================================
-        window.cargarNombresInicial = function() {
-            cargarNombres();
-        }
-    </script>
+        // Lógica para mostrar/ocultar contraseña
+        togglePassword.addEventListener('click', function (e) {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.classList.toggle('fa-eye-slash');
+        });
 
+        // Lógica de SIMULACIÓN de Login y Redirección
+        loginForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            
+            const email = document.querySelector('#emailInput').value.trim();
+            const password = document.querySelector('#passwordInput').value.trim();
+            
+            errorContainer.style.display = 'none';
+
+            // VALIDACIÓN: Cambiamos la URL a 'formulario.html'
+            if (email === "usuario@prueba.com" && password === "123456") {
+                window.location.href = 'formulario.html'; 
+            } else if (email === "" || password === "") {
+                mostrarError("Por favor, ingresa tu email y contraseña.");
+            } else {
+                mostrarError("Nombre de usuario o contraseña incorrectos.");
+            }
+        });
+    </script>
 </body>
 </html>
