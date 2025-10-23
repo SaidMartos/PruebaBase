@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kallpa 3D - Registro de Turistas</title>
     
-    <!-- Importamos la fuente Inter de Google Fonts como sustituto -->
+    <!-- Importamos la fuente Inter de Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Estilos CSS Combinados -->
@@ -14,14 +14,15 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Inter', sans-serif; /* Usamos Inter */
+            font-family: 'Inter', sans-serif;
             
-            background-image: url('img/plaza-de-armas-cajamarca.jpg');
+            /* Usamos un degradado sutil con el filtro blur para que el formulario resalte */
+            background-color: #f0f0f0; 
+            background-image: url('img/plaza-de-armas-cajamarca.jpg'); /* Si la imagen está en tu repo */
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center center;
             background-attachment: fixed;
-            backdrop-filter: blur(1.5px);
             
             position: relative; 
             min-height: 100vh;
@@ -31,85 +32,106 @@
             padding: 40px 20px; /* Padding para móvil */
         }
 
+        /* Se añade una capa semi-transparente para mejorar contraste */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.3); /* Capa oscura */
+            backdrop-filter: blur(2px); /* Un poco más de desenfoque para el fondo */
+            z-index: 0;
+        }
+
         /* ESTILOS DEL CONTENEDOR PRINCIPAL (registro_turistas.css) */
         .container-box {
             background-color: #ffffff;
             padding: 30px;
             border-radius: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
             width: 100%;
             max-width: 450px;
             box-sizing: border-box;
             position: relative; 
             margin: auto;
+            z-index: 1; /* Asegura que el formulario esté sobre el fondo */
         }
 
         h2 {
             font-family: 'Inter', sans-serif;
-            font-weight: 700;
+            font-weight: 800; /* Extra bold */
             text-align: center;
             margin-bottom: 25px;
-            color: #333;
-            font-size: 1.8rem;
+            color: #dc3545; /* Rojo de Kallpa */
+            font-size: 2rem;
+            text-transform: uppercase;
         }
 
         /* Estilos de los grupos de formulario */
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
             text-align: left;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             font-family: 'Inter', sans-serif;
-            font-weight: 600; /* Semibold */
-            color: #555;
+            font-weight: 700; /* Bold */
+            color: #333;
             font-size: 1rem;
         }
         
         /* Estilos de los campos de entrada y selección */
         .form-control {
             width: 100%;
-            padding: 12px 17px;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
+            padding: 14px 18px; /* Más padding para touch */
+            border: 2px solid #ddd;
+            border-radius: 10px; /* Esquinas más suaves */
             box-sizing: border-box;
             font-size: 1.1rem;
             font-family: 'Inter', sans-serif;
-            font-weight: 500; /* Medium */
-            letter-spacing: 0.5px; /* Adaptado para Inter */
+            font-weight: 500;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
+            outline: none;
         }
 
         .form-control::placeholder {
-            color: #999;
+            color: #aaa;
         }
         
         /* Estilos para los botones */
         .btn {
             display: inline-block;
             width: 100%;
-            padding: 14px;
+            padding: 15px;
             border: none;
-            border-radius: 16px;
-            font-size: 1.2rem; /* Ligeramente reducido para el botón de limpiar */
-            font-weight: 600; /* Semibold */
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
             text-align: center;
             text-decoration: none;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.1s ease;
             font-family: 'Inter', sans-serif; 
-            box-shadow: none;
+        }
+
+        .btn:active {
+            transform: translateY(1px);
         }
         
         /* Botón de limpiar */
         .btn-clear {
             background-color: #6c757d;
             color: white;
-            margin-top: 5px;
             width: 48%;
-            padding: 10px;
-            font-size: 1rem;
         }
         
         .btn-clear:hover {
@@ -118,9 +140,8 @@
         
         /* Botón de Registrar */
         .btn-register {
-            background-color: #dc3545;
+            background-color: #dc3545; /* Rojo Principal */
             color: white;
-            margin-top: 5px;
             width: 48%;
         }
 
@@ -133,6 +154,7 @@
             background-color: #e0e0e0;
             color: #a0a0a0;
             cursor: not-allowed;
+            transform: none;
         }
 
         /* Contenedor de botones de Limpiar/Registrar */
@@ -140,22 +162,19 @@
             display: flex;
             justify-content: space-between;
             gap: 10px;
-            margin-top: 15px;
+            margin-top: 25px;
         }
         
         /* Botón Ver Lista de Turistas */
         .btn-list {
-            background-color: #dc3545;
+            background-color: #17a2b8; /* Azul/Cyan */
             color: white;
-            margin-top: 10px;
+            margin-top: 15px;
             width: 100%;
-            padding: 14px;
-            font-size: 1.2rem;
-            border-radius: 16px;
         }
 
         .btn-list:hover {
-            background-color: #c82333;
+            background-color: #138496;
         }
 
         /* Botones flotantes (top-right-buttons) */
@@ -171,14 +190,17 @@
 
         .top-right-buttons .btn-register-user,
         .top-right-buttons .btn-logout {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-family: 'Inter', sans-serif; 
+            /* Usamos la misma clase btn base pero con colores específicos */
+            padding: 8px 12px;
+            font-size: 0.9rem;
             font-weight: 600;
+            border-radius: 8px;
+            width: auto;
+            align-self: flex-end;
+        }
+
+        .top-right-buttons .btn-register-user {
+            background-color: #28a745;
         }
 
         .top-right-buttons .btn-logout {
@@ -198,29 +220,31 @@
             margin-top: 25px;
             margin-bottom: 25px;
             border: 0;
-            border-top: 2px solid #ddd;
+            border-top: 1px solid #eee;
         }
         
         /* Mensajes de feedback */
         .message-box {
             padding: 12px 17px;
-            border-radius: 6px;
+            border-radius: 8px;
             margin-bottom: 19px;
             font-family: 'Inter', sans-serif;
-            font-weight: 500;
+            font-weight: 600;
             text-align: center;
+            border-width: 1px;
+            border-style: solid;
         }
 
         .message-success {
             background-color: #d4edda;
             color: #155724;
-            border: 1px solid #c3e6cb;
+            border-color: #c3e6cb;
         }
 
         .message-error {
             background-color: #f8d7da;
             color: #721c24;
-            border: 1px solid #f5c6cb;
+            border-color: #f5c6cb;
         }
         
         /* Para móvil */
@@ -232,7 +256,9 @@
                 width: 100%;
             }
             .top-right-buttons {
-                position: static;
+                position: relative; /* Lo movemos al flujo normal */
+                top: auto;
+                right: auto;
                 margin-bottom: 20px;
                 flex-direction: row;
                 justify-content: space-around;
@@ -241,7 +267,7 @@
                 padding: 20px;
             }
             body {
-                align-items: flex-start; /* Permite desplazamiento si el formulario es largo */
+                align-items: flex-start; 
             }
         }
     </style>
@@ -256,8 +282,12 @@
         
         setLogLevel('Debug'); // Para ver logs en la consola
         
-        // Variables globales (MANDATORIAS)
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        // ----------------------------------------------------------------------------------
+        // CORRECCIÓN CRÍTICA: Inicialización de Variables Globales (SOLUCIÓN PARA INDEXOF)
+        // ----------------------------------------------------------------------------------
+        
+        // El problema es que el appId podría ser undefined. Lo forzamos a ser un String siempre.
+        const appId = (typeof __app_id !== 'undefined' && __app_id) ? String(__app_id) : 'github-pages-default-id';
         
         // ----------------------------------------------------------------------------------
         // ATENCIÓN: CONFIGURACIÓN DE FIREBASE PARA ENTORNO EXTERNO
@@ -271,7 +301,7 @@
              appId: "1:700600586061:web:f1bfae76ae2ff3ed1db104"
         }; 
 
-        // Esta línea permite que funcione en ambos lugares
+        // Esta línea permite que funcione en ambos lugares (Canvas y GitHub Pages)
         const firebaseConfig = typeof __firebase_config !== 'undefined' && JSON.parse(__firebase_config).projectId 
                                ? JSON.parse(__firebase_config) 
                                : LOCAL_FIREBASE_CONFIG;
@@ -294,9 +324,11 @@
             db = getFirestore(app);
             auth = getAuth(app);
 
+            // Exportamos db, collection, addDoc y el appId a la ventana
             window.db = db;
             window.collection = collection;
             window.addDoc = addDoc;
+            window.appId = appId; // ¡AQUÍ ESTÁ LA CLAVE! Exportamos el appId ya validado como String.
 
             // 2. Manejo de Autenticación
             onAuthStateChanged(auth, async (user) => {
@@ -329,7 +361,6 @@
     </script>
 
     <div class="top-right-buttons">
-        <!-- Estos botones redirigen al index.html y al mismo formulario.html (simulando registro de usuario) -->
         <a href="formulario.html" class="btn btn-register-user">Registrar nuevo usuario</a>
         <a href="index.html" class="btn btn-logout">Cerrar Sesión</a>
     </div>
@@ -339,7 +370,6 @@
         
         <div id="messageContainer" class="message-box" style="display: none;"></div>
         
-        <!-- Formulario: Apellido Materno ahora es REQUIRED -->
         <form id="registroForm">
             
             <div class="form-group mb-3">
@@ -354,7 +384,6 @@
             
             <div class="form-group mb-3">
                 <label for="maternoInput">Apellido Materno</label>
-                <!-- AÑADIMOS 'required' AQUÍ -->
                 <input type="text" id="maternoInput" class="form-control" placeholder="Ingresar Apellido Materno" required />
             </div>
             
@@ -380,15 +409,15 @@
             
             <div class="form-actions">
                 <button type="button" class="btn btn-clear" id="btnLimpiarCampos">Limpiar Campos</button>
-                <a href="lista_turistas.html" class="btn btn-register" id="btnRegistrar" disabled>Cargando...</a>
+                <!-- Este elemento será reemplazado por el botón de submit real -->
+                <button type="button" class="btn btn-register" id="btnPlaceholder" disabled>Cargando...</button> 
             </div>
-            <p id="loadingStatus" style="text-align: center; color: #dc3545; margin-top: 10px; font-weight: 500;">Esperando conexión...</p>
+            <p id="loadingStatus" style="text-align: center; color: #dc3545; margin-top: 10px; font-weight: 600;">Esperando conexión...</p>
         </form>
 
         <hr />
         
         <div class="d-flex-buttons">
-            <!-- Actualizado para enlazar a lista_turistas.html -->
             <a href="lista_turistas.html" class="btn btn-list">Ver Lista de Turistas</a> 
         </div>
     </div>
@@ -405,11 +434,11 @@
             submitButton.classList.add('btn', 'btn-register');
             submitButton.id = 'btnSubmitRegistro';
             
-            // Reemplazamos el 'a' (Ver Lista) temporalmente en la sección de acciones por un botón de submit funcional
-            const originalRegisterLink = document.getElementById('btnRegistrar');
+            // Reemplazamos el placeholder por el botón de submit real
+            const originalPlaceholderButton = document.getElementById('btnPlaceholder');
             const formActions = document.querySelector('.form-actions');
-            if (originalRegisterLink) {
-                 formActions.replaceChild(submitButton, originalRegisterLink);
+            if (originalPlaceholderButton) {
+                formActions.replaceChild(submitButton, originalPlaceholderButton);
             }
 
             const messageContainer = document.querySelector('#messageContainer');
@@ -427,10 +456,9 @@
                     messageContainer.classList.add('message-error');
                 }
                 messageContainer.style.display = 'block';
-                // Ocultar después de 5 segundos
                 setTimeout(() => {
                     messageContainer.style.display = 'none';
-                }, 5000);
+                }, 7000); // 7 segundos para mensajes críticos
             }
             
             // Función de Limpiar Campos
@@ -440,12 +468,11 @@
                 for (let i = 0; i < elementos.length; i++) {
                     const elemento = elementos[i];
                     
-                    // Limpia todos excepto el DNI (que a veces se mantiene para registros rápidos)
-                    if (elemento.id !== "dniInput") {
+                    if (elemento.id !== "dniInput" && elemento.tagName.toLowerCase() !== 'button') {
                         if (elemento.tagName.toLowerCase() === 'input' || elemento.tagName.toLowerCase() === 'textarea') {
                             elemento.value = "";
                         } else if (elemento.tagName.toLowerCase() === 'select') {
-                            elemento.selectedIndex = 0; // Selecciona la primera opción (desactivada)
+                            elemento.selectedIndex = 0;
                         }
                     }
                 }
@@ -455,12 +482,12 @@
             btnLimpiarCampos.addEventListener('click', limpiarCampos);
 
             // 3. Habilitar el Formulario una vez que la Autenticación Esté Lista
-            submitButton.disabled = true; // Aseguramos que esté deshabilitado al inicio
+            submitButton.disabled = true;
             submitButton.textContent = 'Cargando...';
 
             window.isAuthReadyPromise.then(isReady => {
                 loadingStatus.style.display = 'none';
-                if (isReady && window.db) {
+                if (isReady && window.db && window.appId) { // Checkeamos window.appId
                     submitButton.disabled = false;
                     submitButton.textContent = 'Registrar Turista';
                     showMessage("Conexión con la base de datos establecida. Listo para registrar.", true);
@@ -468,6 +495,7 @@
                     submitButton.disabled = true;
                     submitButton.textContent = 'Error de Conexión';
                     showMessage("Error de Conexión. Verifica la configuración de Firebase y la conexión a Internet.", false);
+                    console.error("Inicialización fallida. DB o AppId faltante:", { db: !!window.db, appId: window.appId });
                 }
             });
 
@@ -478,21 +506,17 @@
                 e.preventDefault();
                 messageContainer.style.display = 'none';
                 
-                // Doble chequeo de conexión antes de enviar
-                if (submitButton.disabled || !window.db || !window.authUserId) {
+                if (submitButton.disabled || !window.db || !window.authUserId || !window.appId) {
                     showMessage("Error: La base de datos no está lista o el usuario no está autenticado.", false);
                     return;
                 }
 
                 // 1. Recolectar datos del formulario
-                
-                // CORRECCIÓN CLAVE: Usamos el operador || '' para garantizar que el valor siempre sea una cadena de texto,
-                // evitando el error 'reading indexOf' si el campo devuelve undefined.
                 const dniInput = document.querySelector('#dniInput').value || '';
                 const paternoInput = document.querySelector('#paternoInput').value || '';
                 const maternoInput = document.querySelector('#maternoInput').value || '';
                 const nombresInput = document.querySelector('#nombresInput').value || '';
-                const telefonoInput = document.querySelector('#telefonoInput').value || ''; // Aún si no es requerido
+                const telefonoInput = document.querySelector('#telefonoInput').value || '';
                 const sexoSelect = document.querySelector('#sexoSelect').value || '';
                 
                 const turistaData = {
@@ -508,8 +532,8 @@
                 
                 // Validación simple de campos requeridos (el HTML ya lo hace, pero es buena práctica)
                 if (!turistaData.DNI_Carnet || !turistaData.ApellidoPaterno || !turistaData.ApellidoMaterno || !turistaData.Nombres || !turistaData.Sexo) {
-                     showMessage("Por favor, completa todos los campos marcados como requeridos.", false);
-                     return;
+                    showMessage("Por favor, completa todos los campos marcados como requeridos.", false);
+                    return;
                 }
                 
                 submitButton.disabled = true;
@@ -524,14 +548,13 @@
 
                     showMessage(`¡Turista ${turistaData.Nombres} registrado con éxito!`, true);
                     
-                    // Limpiamos el formulario después de un registro exitoso
-                    registroForm.reset(); 
-                    // Aseguramos que el botón vuelve a estar activo
-                    document.querySelector('#sexoSelect').selectedIndex = 0;
+                    // Limpiamos el formulario (dejando el DNI)
+                    limpiarCampos(); 
 
                 } catch (error) {
+                    // El error se maneja aquí. Si aparece 'indexOf', es porque window.appId estaba undefined A PESAR DE LA PROMESA.
                     console.error("Error al registrar turista en Firestore:", error);
-                    showMessage(`Error al guardar en la base de datos: ${error.message}`, false);
+                    showMessage(`Error al guardar en la base de datos: ${error.message}. (Revisa el AppId o las Reglas)`, false);
                 } finally {
                     submitButton.disabled = false;
                     submitButton.textContent = 'Registrar Turista';
