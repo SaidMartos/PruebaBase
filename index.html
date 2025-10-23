@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guardar y Mostrar Nombres en Firestore</title>
+    <!-- 1. LIBRERÍA XLSX (SheetJS) - NECESARIA PARA GENERAR ARCHIVOS .XLSX -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -64,9 +67,9 @@
     <p id="mensaje"></p>
 
     <h2>Nombres Registrados</h2>
-    <!-- Nuevo botón de exportar -->
+    <!-- Botón de exportar -->
     <button id="btnExportar" onclick="exportarTablaAExcel()" style="margin-bottom: 15px;">
-        Descargar a Excel (CSV)
+        Descargar a Excel (.XLSX)
     </button>
     
     <table id="tablaNombres">
@@ -144,61 +147,29 @@
         }
 
         // =================================================================
-        // FUNCIÓN DE EXPORTACIÓN: Convierte la tabla a CSV y fuerza la descarga
+        // FUNCIÓN DE EXPORTACIÓN (Usando SheetJS para XLSX nativo)
         // =================================================================
         window.exportarTablaAExcel = function() {
             const table = document.getElementById('tablaNombres');
-            let csv = [];
             
-            // Usamos el punto y coma (;) como delimitador, que es el estándar para Excel en español.
-            const DELIMITER = ';'; 
+            // Comprobación de que la librería XLSX ha cargado
+            if (typeof XLSX === 'undefined') {
+                document.getElementById('mensaje').textContent = "Error: La librería de exportación no ha cargado correctamente.";
+                console.error("XLSX library not found. Check the CDN script tag.");
+                return;
+            }
 
-            // 1. Obtener encabezados (<th>)
-            const headers = [];
-            table.querySelectorAll('thead th').forEach(th => {
-                // Limpiamos el texto de encabezado
-                headers.push(th.textContent.trim().replace(/"/g, '""'));
-            });
-            csv.push(headers.join(DELIMITER)); // Unir encabezados con punto y coma
-            
-            // 2. Obtener filas de datos (<td>)
-            table.querySelectorAll('tbody tr').forEach(row => {
-                const rowData = [];
-                row.querySelectorAll('td').forEach(cell => {
-                    let cellData = cell.textContent.trim().replace(/"/g, '""');
-                    
-                    // Si el dato contiene el DELIMITER (punto y coma) o saltos de línea,
-                    // lo encerramos entre comillas dobles para que Excel lo maneje como un solo campo.
-                    if (cellData.includes(DELIMITER) || cellData.includes('\n')) {
-                        cellData = `"${cellData}"`;
-                    }
-                    rowData.push(cellData);
-                });
-                
-                // Solo añadir la fila si tiene la misma cantidad de columnas que el encabezado (para evitar filas de error/mensaje)
-                if (rowData.length === headers.length) {
-                    csv.push(rowData.join(DELIMITER)); // Unir datos con punto y coma
-                }
+            // 1. Convertir la tabla HTML (por su ID) a un libro de trabajo (Workbook)
+            const workbook = XLSX.utils.table_to_book(table, { 
+                sheet: "Nombres Registrados", // Nombre de la hoja en Excel
+                raw: false // Intentar parsear las fechas/números automáticamente
             });
 
-            // 3. Crear el archivo Blob y descargar
-            const csvString = csv.join('\n');
-            // Agregamos el prefijo BOM para asegurar que Excel reconozca correctamente los caracteres especiales (UTF-8)
-            const BOM = "\uFEFF"; 
-            const blob = new Blob([BOM + csvString], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
+            // 2. Escribir el archivo XLSX y forzar la descarga
+            const filename = 'nombres_registrados_' + new Date().toISOString().slice(0, 10) + '.xlsx';
             
-            // Simular el clic en un enlace de descarga
-            const link = document.createElement('a');
-            link.setAttribute('href', url);
-            // Nombre del archivo de descarga
-            link.setAttribute('download', 'nombres_firestore_' + new Date().toISOString().slice(0, 10) + '.csv');
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            URL.revokeObjectURL(url); // Liberar el recurso Blob
+            // XLSX.writeFile se encarga de todo el proceso de descarga y formato
+            XLSX.writeFile(workbook, filename);
         }
 
 
