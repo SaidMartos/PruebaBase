@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Guardar Nombre en Firestore (Módulos)</title>
+</head>
+<body>
+
+    <h1>Guardar mi Nombre en Firebase</h1>
+    <input type="text" id="inputNombre" placeholder="Ingresa tu nombre">
+    <button onclick="guardarNombre()">Guardar en DB</button>
+    <p id="mensaje"></p>
+
+    <script type="module">
+        // 1. Importar las funciones necesarias desde el SDK de Firebase
+        // Necesitas 'initializeApp' para iniciar la app y 'getFirestore' y 'addDoc'/'collection' para la base de datos.
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // NOTA: Reemplacé la versión '12.4.0' por la más estable y reciente en este momento (10.12.2),
+        // pero puedes usar la que desees si actualizas la URL en las importaciones.
+
+        // 2. Tu configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBifMbYtOkxsijnaKlTtl_S_A5dkzE32BM",
+            authDomain: "prueba-ff7bb.firebaseapp.com",
+            projectId: "prueba-ff7bb",
+            storageBucket: "prueba-ff7bb.firebasestorage.app",
+            messagingSenderId: "700600586061",
+            appId: "1:700600586061:web:f1bfae76ae2ff3ed1db104"
+        };
+
+        // 3. Inicializar Firebase y Firestore
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app); // Obtenemos la referencia a Firestore
+
+        // 4. Exponemos la función `guardarNombre` al ámbito global (window)
+        // Esto es necesario para que el `onclick="guardarNombre()"` del botón pueda encontrar la función,
+        // ya que las variables y funciones dentro de `<script type="module">` son privadas por defecto.
+        window.guardarNombre = async function() {
+            const nombreInput = document.getElementById('inputNombre');
+            const mensaje = document.getElementById('mensaje');
+            const nombre = nombreInput.value.trim();
+
+            if (nombre === "") {
+                mensaje.textContent = "Por favor, ingresa un nombre.";
+                return;
+            }
+
+            try {
+                // Referencia a la colección donde guardaremos los nombres
+                const docRef = await addDoc(collection(db, "nombres_registrados"), {
+                    nombre: nombre,
+                    // Usamos serverTimestamp() para que Firebase ponga la hora del servidor
+                    fecha: serverTimestamp() 
+                });
+
+                mensaje.textContent = `¡"${nombre}" guardado! ID: ${docRef.id} 🎉`;
+                nombreInput.value = ''; // Limpiar el campo
+            } catch (error) {
+                console.error("Error al escribir en Firestore: ", error);
+                mensaje.textContent = "❌ Error al guardar. Revisa la consola.";
+            }
+        }
+    </script>
+
+</body>
+</html>
