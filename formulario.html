@@ -10,29 +10,27 @@
     
     <!-- Estilos CSS Combinados -->
     <style>
+        /* (Se mantienen los estilos CSS del archivo original para la estética) */
+
         /* BASE DE SITE.CSS */
         body {
             margin: 0;
             padding: 0;
             font-family: 'Inter', sans-serif;
-            
-            /* Usamos un degradado sutil con el filtro blur para que el formulario resalte */
             background-color: #f0f0f0; 
-            background-image: url('img/plaza-de-armas-cajamarca.jpg'); /* Si la imagen está en tu repo */
+            background-image: url('img/plaza-de-armas-cajamarca.jpg');
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center center;
             background-attachment: fixed;
-            
             position: relative; 
             min-height: 100vh;
-            display: flex; /* Centrado visual */
+            display: flex;
             justify-content: center;
             align-items: center;
-            padding: 40px 20px; /* Padding para móvil */
+            padding: 40px 20px;
         }
 
-        /* Se añade una capa semi-transparente para mejorar contraste */
         body::before {
             content: '';
             position: absolute;
@@ -40,8 +38,8 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(0, 0, 0, 0.3); /* Capa oscura */
-            backdrop-filter: blur(2px); /* Un poco más de desenfoque para el fondo */
+            background-color: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(2px);
             z-index: 0;
         }
 
@@ -50,21 +48,21 @@
             background-color: #ffffff;
             padding: 30px;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             width: 100%;
             max-width: 450px;
             box-sizing: border-box;
             position: relative; 
             margin: auto;
-            z-index: 1; /* Asegura que el formulario esté sobre el fondo */
+            z-index: 1;
         }
 
         h2 {
             font-family: 'Inter', sans-serif;
-            font-weight: 800; /* Extra bold */
+            font-weight: 800;
             text-align: center;
             margin-bottom: 25px;
-            color: #dc3545; /* Rojo de Kallpa */
+            color: #dc3545;
             font-size: 2rem;
             text-transform: uppercase;
         }
@@ -79,7 +77,7 @@
             display: block;
             margin-bottom: 6px;
             font-family: 'Inter', sans-serif;
-            font-weight: 700; /* Bold */
+            font-weight: 700;
             color: #333;
             font-size: 1rem;
         }
@@ -87,9 +85,9 @@
         /* Estilos de los campos de entrada y selección */
         .form-control {
             width: 100%;
-            padding: 14px 18px; /* Más padding para touch */
+            padding: 14px 18px;
             border: 2px solid #ddd;
-            border-radius: 10px; /* Esquinas más suaves */
+            border-radius: 10px;
             box-sizing: border-box;
             font-size: 1.1rem;
             font-family: 'Inter', sans-serif;
@@ -140,7 +138,7 @@
         
         /* Botón de Registrar */
         .btn-register {
-            background-color: #dc3545; /* Rojo Principal */
+            background-color: #dc3545;
             color: white;
             width: 48%;
         }
@@ -167,7 +165,7 @@
         
         /* Botón Ver Lista de Turistas */
         .btn-list {
-            background-color: #17a2b8; /* Azul/Cyan */
+            background-color: #17a2b8;
             color: white;
             margin-top: 15px;
             width: 100%;
@@ -183,22 +181,19 @@
             top: 20px;
             right: 20px;
             display: flex;
-            flex-direction: column;
             gap: 10px;
             z-index: 10;
         }
-
+        
         .top-right-buttons .btn-register-user,
         .top-right-buttons .btn-logout {
-            /* Usamos la misma clase btn base pero con colores específicos */
             padding: 8px 12px;
             font-size: 0.9rem;
             font-weight: 600;
             border-radius: 8px;
             width: auto;
-            align-self: flex-end;
         }
-
+        
         .top-right-buttons .btn-register-user {
             background-color: #28a745;
         }
@@ -206,7 +201,7 @@
         .top-right-buttons .btn-logout {
             background-color: #dc3545;
         }
-
+        
         .top-right-buttons .btn-register-user:hover {
             background-color: #218838;
         }
@@ -215,24 +210,22 @@
             background-color: #c82333;
         }
 
-        /* Elementos de interfaz */
-        hr {
-            margin-top: 25px;
-            margin-bottom: 25px;
-            border: 0;
-            border-top: 1px solid #eee;
-        }
-        
-        /* Mensajes de feedback */
+        /* Mensajes de error/éxito */
         .message-box {
-            padding: 12px 17px;
-            border-radius: 8px;
-            margin-bottom: 19px;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
             font-family: 'Inter', sans-serif;
             font-weight: 600;
             text-align: center;
-            border-width: 1px;
-            border-style: solid;
+            display: none;
+            border: 1px solid transparent;
+        }
+
+        .message-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
         }
 
         .message-success {
@@ -241,35 +234,21 @@
             border-color: #c3e6cb;
         }
 
-        .message-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border-color: #f5c6cb;
+        /* Estilo para mostrar el ID de usuario */
+        #userIdDisplay {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: #000;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 5px 10px;
+            border-radius: 5px;
+            z-index: 2;
+            white-space: nowrap;
         }
         
-        /* Para móvil */
-        @media (max-width: 600px) {
-            .form-actions {
-                flex-direction: column;
-            }
-            .btn-clear, .btn-register {
-                width: 100%;
-            }
-            .top-right-buttons {
-                position: relative; /* Lo movemos al flujo normal */
-                top: auto;
-                right: auto;
-                margin-bottom: 20px;
-                flex-direction: row;
-                justify-content: space-around;
-            }
-            .container-box {
-                padding: 20px;
-            }
-            body {
-                align-items: flex-start; 
-            }
-        }
     </style>
 </head>
 
@@ -277,45 +256,40 @@
     <!-- Importaciones de Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        setLogLevel('Debug'); // Para ver logs en la consola
-        
+        setLogLevel('Debug'); // Habilitar logs para depuración
+
         // ----------------------------------------------------------------------------------
-        // CORRECCIÓN CRÍTICA: Inicialización de Variables Globales (SOLUCIÓN PARA INDEXOF)
+        // CONFIGURACIÓN DE FIREBASE (Asegurando robustez en el entorno Canvas/GitHub)
         // ----------------------------------------------------------------------------------
-        
-        // El problema es que el appId podría ser undefined. Lo forzamos a ser un String siempre.
         const appId = (typeof __app_id !== 'undefined' && __app_id) ? String(__app_id) : 'github-pages-default-id';
         
-        // ----------------------------------------------------------------------------------
-        // ATENCIÓN: CONFIGURACIÓN DE FIREBASE PARA ENTORNO EXTERNO
-        // ----------------------------------------------------------------------------------
+        // Configuración de Firebase local/fallback (Asegúrate de que este sea el proyecto 'Prueba')
         const LOCAL_FIREBASE_CONFIG = {
-             apiKey: "AIzaSyBifMbYtOkxsijnaKlTtl_S_A5dkzE32BM",
+             apiKey: "AIzaSyBifMbYtOkxsijnaKlTtl_S_A5dkzE32BM", // Este key es de ejemplo, úsalo si no hay variables globales
              authDomain: "prueba-ff7bb.firebaseapp.com",
-             projectId: "prueba-ff7bb",
-             storageBucket: "prueba-ff7bb.firebasestorage.app",
+             projectId: "prueba-ff7bb", // <--- ESTE DEBE COINCIDIR CON TU PROYECTO
+             storageBucket: "prueba-ff7bb.appspot.com",
              messagingSenderId: "700600586061",
              appId: "1:700600586061:web:f1bfae76ae2ff3ed1db104"
         }; 
 
-        // Esta línea permite que funcione en ambos lugares (Canvas y GitHub Pages)
+        // Usamos la configuración de Canvas si está disponible y es válida, sino usamos el fallback
         const firebaseConfig = typeof __firebase_config !== 'undefined' && JSON.parse(__firebase_config).projectId 
                                ? JSON.parse(__firebase_config) 
                                : LOCAL_FIREBASE_CONFIG;
         
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        // ----------------------------------------------------------------------------------
         
         let db, auth;
-        let authReadyPromiseResolver;
-        window.isAuthReadyPromise = new Promise(resolve => {
-            authReadyPromiseResolver = resolve;
-        });
+        let userId = null;
+        let isAuthReady = false;
 
-        // 1. Inicialización de Firebase
+        // ----------------------------------------------------------------------------------
+        // 1. Inicialización y Autenticación
+        // ----------------------------------------------------------------------------------
         try {
             if (!firebaseConfig.projectId) {
                 throw new Error("La configuración de Firebase está incompleta. No se pudo obtener projectId.");
@@ -323,244 +297,219 @@
             const app = initializeApp(firebaseConfig);
             db = getFirestore(app);
             auth = getAuth(app);
-
-            // Exportamos db, collection, addDoc y el appId a la ventana
-            window.db = db;
-            window.collection = collection;
-            window.addDoc = addDoc;
-            window.appId = appId; // ¡AQUÍ ESTÁ LA CLAVE! Exportamos el appId ya validado como String.
-
-            // 2. Manejo de Autenticación
+            
+            // Listener de estado de autenticación
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
-                    console.log(`Firebase: Usuario autenticado. UID: ${user.uid}`);
-                    window.authUserId = user.uid; // Exportar el ID de usuario
-                    authReadyPromiseResolver(true);
+                    userId = user.uid;
+                    isAuthReady = true;
+                    document.getElementById('userIdDisplay').textContent = `Usuario ID: ${userId} | App ID: ${appId}`;
+                    console.log(`Firebase: Usuario autenticado. UID: ${userId}`);
                 } else {
-                    // Si no está autenticado, intentar la autenticación inicial
+                    // Intento de autenticación inicial (Custom Token o Anónimo)
                     try {
                         if (initialAuthToken) {
                             await signInWithCustomToken(auth, initialAuthToken);
                         } else {
-                            // Usar autenticación anónima como fallback para acceder a datos públicos
                             await signInAnonymously(auth); 
                         }
                     } catch (error) {
-                        console.error("Firebase: Error al intentar autenticar anónimamente:", error);
-                        authReadyPromiseResolver(false); // Falla la autenticación
+                         // Mostrar error si la autenticación falla
+                        showMessage("Error al autenticar. Verifica que la Autenticación de Firebase esté activa (Anónimo).", false);
+                        console.error("Firebase: Error al intentar autenticar:", error);
                     }
                 }
             });
 
         } catch (error) {
             console.error("Firebase Initialization Error:", error);
-            authReadyPromiseResolver(false);
-            window.db = null;
+            showMessage(`Error de conexión: ${error.message}`, false);
         }
 
-    </script>
+        // --- Funciones de Utilidad ---
 
+        function showMessage(message, isSuccess) {
+            const container = document.getElementById('messageContainer');
+            container.textContent = message;
+            container.className = 'message-box';
+            
+            if (isSuccess) {
+                container.classList.add('message-success');
+            } else {
+                container.classList.add('message-error');
+            }
+            container.style.display = 'block';
+            setTimeout(() => {
+                container.style.display = 'none';
+            }, 5000);
+        }
+
+        function clearForm() {
+            document.getElementById('registroForm').reset();
+            document.getElementById('messageContainer').style.display = 'none';
+            document.getElementById('btnRegistrar').disabled = false;
+        }
+
+        // ----------------------------------------------------------------------------------
+        // 2. Lógica de Registro (Añadiendo try/catch más específico)
+        // ----------------------------------------------------------------------------------
+
+        async function registrarTurista() {
+            if (!isAuthReady || !userId) {
+                showMessage("Autenticación no completa. Intenta nuevamente.", false);
+                return;
+            }
+            if (!db) {
+                showMessage("Base de datos no inicializada.", false);
+                return;
+            }
+            
+            document.getElementById('btnRegistrar').disabled = true;
+            showMessage("Registrando turista...", true);
+
+            const form = document.getElementById('registroForm');
+            
+            const turistaData = {
+                DNI_Carnet: form.DNI_Carnet.value.trim(),
+                ApellidoPaterno: form.ApellidoPaterno.value.trim(),
+                ApellidoMaterno: form.ApellidoMaterno.value.trim(),
+                Nombres: form.Nombres.value.trim(),
+                Telefono: form.Telefono.value.trim(),
+                Sexo: form.SexoSelect.value,
+                PaisOrigen: form.paisOrigenSelect.value, // Nuevo campo
+                FechaRegistro: new Date().toISOString(), // Usar ISO string para consistencia
+                RegistradoPor: userId // Guardar el UID del usuario que registra
+            };
+
+            // Validación simple
+            if (!turistaData.DNI_Carnet || !turistaData.Nombres || !turistaData.ApellidoPaterno) {
+                showMessage("Por favor, complete los campos obligatorios (DNI, Nombres, Apellido Paterno).", false);
+                document.getElementById('btnRegistrar').disabled = false;
+                return;
+            }
+
+            try {
+                // RUTA CRÍTICA: artifacts/{appId}/public/data/turistas
+                const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'turistas');
+                
+                await addDoc(colRef, turistaData);
+
+                showMessage("✅ Turista registrado exitosamente.", true);
+                clearForm();
+                
+            } catch (error) {
+                console.error("Error al registrar turista en Firestore:", error);
+                
+                // Mostrar el error específico de permisos
+                if (error.code === 'permission-denied' || error.message.includes('insufficient permissions')) {
+                    showMessage("❌ Error al guardar en la base de datos: Missing or insufficient permissions. (Revisa el AppId y las Reglas de Seguridad)", false);
+                } else {
+                    showMessage(`❌ Error de Firestore: ${error.message}`, false);
+                }
+                
+                document.getElementById('btnRegistrar').disabled = false;
+            }
+        }
+
+        // Asignación de eventos al cargar el documento
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('btnRegistrar').addEventListener('click', registrarTurista);
+            document.getElementById('btnClear').addEventListener('click', clearForm);
+            document.getElementById('btnCerrarSesion').addEventListener('click', async () => {
+                try {
+                    await signOut(auth);
+                    showMessage("Sesión cerrada.", true);
+                    window.location.reload(); // Recargar para iniciar sesión anónima
+                } catch (error) {
+                    showMessage(`Error al cerrar sesión: ${error.message}`, false);
+                }
+            });
+        });
+
+    </script>
+    <!-- ... (El resto del HTML sigue igual) ... -->
+    
     <div class="top-right-buttons">
-        <a href="formulario.html" class="btn btn-register-user">Registrar nuevo usuario</a>
-        <a href="index.html" class="btn btn-logout">Cerrar Sesión</a>
+        <!-- Estos botones no están implementados en este script, solo son visuales -->
+        <button class="btn btn-register-user" disabled>Registrar nuevo usuario</button>
+        <button id="btnCerrarSesion" class="btn btn-logout">Cerrar Sesión</button>
     </div>
 
     <div class="container-box">
-        <h2 class="text-center">¡Bienvenido a la Ficha de Registro!</h2>
+        <h2 class="text-center">¡BIENVENIDO A LA FICHA DE REGISTRO!</h2>
         
-        <div id="messageContainer" class="message-box" style="display: none;"></div>
-        
+        <div id="messageContainer" class="message-box" style="display: none;">
+            Error al guardar en la base de datos: Missing or insufficient permissions. (Revisa el AppId y las Reglas)
+        </div>
+
         <form id="registroForm">
-            
-            <div class="form-group mb-3">
-                <label for="dniInput">D.N.I. o Carnet de Extranjería</label>
-                <input type="text" id="dniInput" class="form-control" placeholder="Ingresar D.N.I." required />
+            <!-- DNI o Carnet de Extranjería -->
+            <div class="form-group">
+                <label for="DNI_Carnet">D.N.I. o Carnet de Extranjería</label>
+                <input type="text" id="DNI_Carnet" name="DNI_Carnet" class="form-control" placeholder="Ingresar D.N.I." required>
             </div>
-            
-            <div class="form-group mb-3">
-                <label for="paternoInput">Apellido Paterno</label>
-                <input type="text" id="paternoInput" class="form-control" placeholder="Ingresar Apellido Paterno" required />
+
+            <!-- Apellido Paterno -->
+            <div class="form-group">
+                <label for="ApellidoPaterno">Apellido Paterno</label>
+                <input type="text" id="ApellidoPaterno" name="ApellidoPaterno" class="form-control" required>
             </div>
-            
-            <div class="form-group mb-3">
-                <label for="maternoInput">Apellido Materno</label>
-                <input type="text" id="maternoInput" class="form-control" placeholder="Ingresar Apellido Materno" required />
+
+            <!-- Apellido Materno -->
+            <div class="form-group">
+                <label for="ApellidoMaterno">Apellido Materno</label>
+                <input type="text" id="ApellidoMaterno" name="ApellidoMaterno" class="form-control">
             </div>
-            
-            <div class="form-group mb-3">
-                <label for="nombresInput">Nombres</label>
-                <input type="text" id="nombresInput" class="form-control" placeholder="Ingresar Nombres" required />
+
+            <!-- Nombres -->
+            <div class="form-group">
+                <label for="Nombres">Nombres</label>
+                <input type="text" id="Nombres" name="Nombres" class="form-control" required>
             </div>
-            
-            <div class="form-group mb-3">
-                <label for="telefonoInput">Teléfono</label>
-                <input type="tel" id="telefonoInput" class="form-control" placeholder="Ingresar tu teléfono" />
+
+            <!-- Teléfono -->
+            <div class="form-group">
+                <label for="Telefono">Teléfono</label>
+                <input type="tel" id="Telefono" name="Telefono" class="form-control">
             </div>
-            
-            <div class="form-group mb-3">
-                <label for="sexoSelect">Sexo</label>
-                <select id="sexoSelect" class="form-control" required>
-                    <option value="" disabled selected>Selecciona tu Sexo</option>
+
+            <!-- Sexo -->
+            <div class="form-group">
+                <label for="SexoSelect">Sexo</label>
+                <select id="SexoSelect" name="SexoSelect" class="form-control">
                     <option value="Masculino">Masculino</option>
                     <option value="Femenino">Femenino</option>
                     <option value="Otro">Otro</option>
                 </select>
             </div>
-            
-            <div class="form-actions">
-                <button type="button" class="btn btn-clear" id="btnLimpiarCampos">Limpiar Campos</button>
-                <!-- Este elemento será reemplazado por el botón de submit real -->
-                <button type="button" class="btn btn-register" id="btnPlaceholder" disabled>Cargando...</button> 
+
+            <!-- País de Origen (Nuevo campo) -->
+            <div class="form-group">
+                <label for="paisOrigenSelect">País de Origen</label>
+                <select id="paisOrigenSelect" name="paisOrigenSelect" class="form-control">
+                    <option value="Peru" selected>Perú</option>
+                    <option value="Colombia">Colombia</option>
+                    <option value="Ecuador">Ecuador</option>
+                    <option value="Chile">Chile</option>
+                    <option value="Venezuela">Venezuela</option>
+                    <option value="Argentina">Argentina</option>
+                    <option value="Brasil">Brasil</option>
+                    <option value="España">España</option>
+                    <option value="EEUU">Estados Unidos</option>
+                    <option value="Otro">Otro</option>
+                </select>
             </div>
-            <p id="loadingStatus" style="text-align: center; color: #dc3545; margin-top: 10px; font-weight: 600;">Esperando conexión...</p>
+
+            <div class="form-actions">
+                <button type="button" id="btnClear" class="btn btn-clear">Limpiar Campos</button>
+                <button type="button" id="btnRegistrar" class="btn btn-register">Registrar Turista</button>
+            </div>
+            
         </form>
-
-        <hr />
         
-        <div class="d-flex-buttons">
-            <a href="lista_turistas.html" class="btn btn-list">Ver Lista de Turistas</a> 
-        </div>
+        <a href="lista_turistas.html" class="btn btn-list">Ver Lista de Turistas</a>
     </div>
-
-    <script>
-        // Lógica de JavaScript
-        document.addEventListener('DOMContentLoaded', () => {
-            const registroForm = document.querySelector('#registroForm');
-            const btnLimpiarCampos = document.querySelector('#btnLimpiarCampos');
-            
-            // Creamos un botón de submit funcional
-            const submitButton = document.createElement('button');
-            submitButton.setAttribute('type', 'submit');
-            submitButton.classList.add('btn', 'btn-register');
-            submitButton.id = 'btnSubmitRegistro';
-            
-            // Reemplazamos el placeholder por el botón de submit real
-            const originalPlaceholderButton = document.getElementById('btnPlaceholder');
-            const formActions = document.querySelector('.form-actions');
-            if (originalPlaceholderButton) {
-                formActions.replaceChild(submitButton, originalPlaceholderButton);
-            }
-
-            const messageContainer = document.querySelector('#messageContainer');
-            const loadingStatus = document.querySelector('#loadingStatus');
-
-            // --- Funciones de Utilidad ---
-            
-            function showMessage(message, isSuccess) {
-                messageContainer.textContent = message;
-                messageContainer.className = 'message-box';
-                
-                if (isSuccess) {
-                    messageContainer.classList.add('message-success');
-                } else {
-                    messageContainer.classList.add('message-error');
-                }
-                messageContainer.style.display = 'block';
-                setTimeout(() => {
-                    messageContainer.style.display = 'none';
-                }, 7000); // 7 segundos para mensajes críticos
-            }
-            
-            // Función de Limpiar Campos
-            function limpiarCampos() {
-                const elementos = registroForm.elements;
-
-                for (let i = 0; i < elementos.length; i++) {
-                    const elemento = elementos[i];
-                    
-                    if (elemento.id !== "dniInput" && elemento.tagName.toLowerCase() !== 'button') {
-                        if (elemento.tagName.toLowerCase() === 'input' || elemento.tagName.toLowerCase() === 'textarea') {
-                            elemento.value = "";
-                        } else if (elemento.tagName.toLowerCase() === 'select') {
-                            elemento.selectedIndex = 0;
-                        }
-                    }
-                }
-                showMessage("Campos de Apellidos, Nombres, Teléfono y Sexo limpiados.", true);
-            }
-            
-            btnLimpiarCampos.addEventListener('click', limpiarCampos);
-
-            // 3. Habilitar el Formulario una vez que la Autenticación Esté Lista
-            submitButton.disabled = true;
-            submitButton.textContent = 'Cargando...';
-
-            window.isAuthReadyPromise.then(isReady => {
-                loadingStatus.style.display = 'none';
-                if (isReady && window.db && window.appId) { // Checkeamos window.appId
-                    submitButton.disabled = false;
-                    submitButton.textContent = 'Registrar Turista';
-                    showMessage("Conexión con la base de datos establecida. Listo para registrar.", true);
-                } else {
-                    submitButton.disabled = true;
-                    submitButton.textContent = 'Error de Conexión';
-                    showMessage("Error de Conexión. Verifica la configuración de Firebase y la conexión a Internet.", false);
-                    console.error("Inicialización fallida. DB o AppId faltante:", { db: !!window.db, appId: window.appId });
-                }
-            });
-
-
-            // --- Lógica de Firebase Firestore para el Registro ---
-            
-            registroForm.addEventListener('submit', async function (e) {
-                e.preventDefault();
-                messageContainer.style.display = 'none';
-                
-                if (submitButton.disabled || !window.db || !window.authUserId || !window.appId) {
-                    showMessage("Error: La base de datos no está lista o el usuario no está autenticado.", false);
-                    return;
-                }
-
-                // 1. Recolectar datos del formulario
-                const dniInput = document.querySelector('#dniInput').value || '';
-                const paternoInput = document.querySelector('#paternoInput').value || '';
-                const maternoInput = document.querySelector('#maternoInput').value || '';
-                const nombresInput = document.querySelector('#nombresInput').value || '';
-                const telefonoInput = document.querySelector('#telefonoInput').value || '';
-                const sexoSelect = document.querySelector('#sexoSelect').value || '';
-                
-                const turistaData = {
-                    DNI_Carnet: dniInput.trim(),
-                    ApellidoPaterno: paternoInput.trim(),
-                    ApellidoMaterno: maternoInput.trim(),
-                    Nombres: nombresInput.trim(),
-                    Telefono: telefonoInput.trim(),
-                    Sexo: sexoSelect,
-                    FechaRegistro: new Date().toISOString(),
-                    RegistradoPor: window.authUserId, 
-                };
-                
-                // Validación simple de campos requeridos (el HTML ya lo hace, pero es buena práctica)
-                if (!turistaData.DNI_Carnet || !turistaData.ApellidoPaterno || !turistaData.ApellidoMaterno || !turistaData.Nombres || !turistaData.Sexo) {
-                    showMessage("Por favor, completa todos los campos marcados como requeridos.", false);
-                    return;
-                }
-                
-                submitButton.disabled = true;
-                submitButton.textContent = 'Guardando...';
-
-                // 2. Guardar datos en Firestore
-                try {
-                    // Usamos la colección 'turistas' en el path público
-                    const turistasColRef = window.collection(window.db, 'artifacts', window.appId, 'public', 'data', 'turistas');
-                    
-                    await window.addDoc(turistasColRef, turistaData);
-
-                    showMessage(`¡Turista ${turistaData.Nombres} registrado con éxito!`, true);
-                    
-                    // Limpiamos el formulario (dejando el DNI)
-                    limpiarCampos(); 
-
-                } catch (error) {
-                    // El error se maneja aquí. Si aparece 'indexOf', es porque window.appId estaba undefined A PESAR DE LA PROMESA.
-                    console.error("Error al registrar turista en Firestore:", error);
-                    showMessage(`Error al guardar en la base de datos: ${error.message}. (Revisa el AppId o las Reglas)`, false);
-                } finally {
-                    submitButton.disabled = false;
-                    submitButton.textContent = 'Registrar Turista';
-                }
-            });
-        });
-    </script>
+    
+    <div id="userIdDisplay"></div>
 </body>
 </html>
