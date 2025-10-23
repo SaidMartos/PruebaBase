@@ -1,0 +1,5 @@
+# GitHub Pages y Unity WebGL Fix
+# Esto fuerza a GitHub Pages a servir archivos .wasm y .data
+# con el tipo MIME correcto (Application/octet-stream).
+
+include: [".js", ".wasm", ".data", ".unityweb"]

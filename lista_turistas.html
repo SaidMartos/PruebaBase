@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kallpa 3D - Lista de Turistas</title>
+    
+    <!-- Importamos la fuente Inter de Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Estilos CSS Combinados (Diseño profesional y responsive) -->
+    <style>
+        /* BASE Y FONDO */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f0f0; 
+            background-image: url('img/plaza-de-armas-cajamarca.jpg'); /* Fondo sutil */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
+            position: relative; 
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; 
+            padding: 40px 20px;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5); 
+            backdrop-filter: blur(2px);
+            z-index: 0;
+        }
+
+        /* CONTENEDOR PRINCIPAL */
+        .container-box {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 1000px; /* Ancho mayor para la tabla */
+            box-sizing: border-box;
+            position: relative; 
+            margin: 40px auto;
+            z-index: 1;
+        }
+
+        h2 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 25px;
+            color: #17a2b8; /* Azul/Cyan */
+            font-size: 2.2rem;
+            text-transform: uppercase;
+        }
+
+        /* MENSAJES DE FEEDBACK */
+        .message-box {
+            padding: 12px 17px;
+            border-radius: 8px;
+            margin-bottom: 19px;
+            font-weight: 600;
+            text-align: center;
+            border-width: 1px;
+            border-style: solid;
+            display: none;
+        }
+
+        .message-success {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .message-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+        
+        /* BOTONES DE ACCIÓN */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-family: 'Inter', sans-serif; 
+        }
+
+        .btn-back {
+            background-color: #6c757d;
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        .btn-back:hover {
+            background-color: #5a6268;
+        }
+        
+        /* Estilo para mostrar el ID de usuario */
+        #userIdDisplay {
+            font-size: 0.75rem;
+            color: #000;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+
+        /* ESTILOS DE TABLA RESPONSIVE */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto; 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .turistas-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 950px; /* Ancho mínimo para la tabla */
+        }
+
+        .turistas-table th, .turistas-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .turistas-table th {
+            background-color: #17a2b8;
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .turistas-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .turistas-table tr:hover {
+            background-color: #f1f1f1;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        /* Para móvil */
+        @media (max-width: 1024px) {
+            .container-box {
+                max-width: 100%;
+                padding: 20px;
+                margin: 20px auto;
+            }
+            body {
+                align-items: flex-start;
+                padding: 20px 10px;
+            }
+        }
+        
+        /* Loader simple */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #17a2b8;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 2s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Importaciones de Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, query, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        setLogLevel('Debug'); // Para ver logs en la consola
+        
+        // ----------------------------------------------------------------------------------
+        // CONFIGURACIÓN DE FIREBASE (Asegurando la misma configuración que formulario.html)
+        // ----------------------------------------------------------------------------------
+        const appId = (typeof __app_id !== 'undefined' && __app_id) ? String(__app_id) : 'github-pages-default-id';
+        
+        // Configuración de Firebase local/fallback (Asumimos el mismo proyecto)
+        const LOCAL_FIREBASE_CONFIG = {
+             apiKey: "AIzaSyBifMbYtOkxsijnaKlTtl_S_A5dkzE32BM", 
+             authDomain: "prueba-ff7bb.firebaseapp.com",
+             projectId: "prueba-ff7bb", 
+             storageBucket: "prueba-ff7bb.appspot.com",
+             messagingSenderId: "700600586061",
+             appId: "1:700600586061:web:f1bfae76ae2ff3ed1db104"
+        }; 
+
+        const firebaseConfig = typeof __firebase_config !== 'undefined' && JSON.parse(__firebase_config).projectId 
+                               ? JSON.parse(__firebase_config) 
+                               : LOCAL_FIREBASE_CONFIG;
+        
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // ----------------------------------------------------------------------------------
+        
+        let db, auth;
+        let userId = null;
+        let isAuthReady = false;
+
+        // 1. Inicialización y Autenticación de Firebase
+        try {
+            if (!firebaseConfig.projectId) {
+                throw new Error("La configuración de Firebase está incompleta.");
+            }
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            
+            // 2. Listener de estado de autenticación
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    userId = user.uid;
+                    isAuthReady = true;
+                    document.getElementById('userIdDisplay').textContent = `Usuario ID: ${userId} | App ID: ${appId}`;
+                    // Iniciar la carga de datos una vez autenticado
+                    loadTuristasList(); 
+                } else {
+                    // Intento de autenticación inicial (Custom Token o Anónimo)
+                    try {
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } else {
+                            await signInAnonymously(auth); 
+                        }
+                    } catch (error) {
+                        console.error("Firebase: Error al intentar autenticar anónimamente:", error);
+                        showMessage('Error: Falló la autenticación inicial.', false);
+                    }
+                }
+            });
+
+        } catch (error) {
+            console.error("Firebase Initialization Error:", error);
+            showMessage(`Error de conexión: ${error.message}`, false);
+        }
+
+        // --- Funciones de Utilidad ---
+        function showMessage(message, isSuccess) {
+            const container = document.getElementById('messageContainer');
+            container.textContent = message;
+            container.className = 'message-box';
+            
+            if (isSuccess) {
+                container.classList.add('message-success');
+            } else {
+                container.classList.add('message-error');
+            }
+            container.style.display = 'block';
+            setTimeout(() => {
+                container.style.display = 'none';
+            }, 7000); // 7 segundos para mensajes de lista
+        }
+
+        function formatDate(isoString) {
+            try {
+                // Si es un ISO String, lo convertimos a un formato legible
+                const date = new Date(isoString);
+                return date.toLocaleDateString('es-ES', { 
+                    year: 'numeric', month: '2-digit', day: '2-digit' 
+                }) + ' ' + date.toLocaleTimeString('es-ES', {
+                    hour: '2-digit', minute: '2-digit'
+                });
+            } catch (e) {
+                return 'N/A';
+            }
+        }
+
+        // --- Lógica Principal: Cargar Lista de Turistas ---
+
+        function loadTuristasList() {
+            if (!db || !appId || !isAuthReady) {
+                // Si la función se llama antes de que Firebase esté listo, salimos
+                return;
+            }
+            
+            // RUTA DE COLECCIÓN: artifacts/{appId}/public/data/turistas
+            const turistasColRef = collection(db, 'artifacts', appId, 'public', 'data', 'turistas');
+            const q = query(turistasColRef);
+            
+            const tableBody = document.getElementById('turistasTableBody');
+            
+            tableBody.innerHTML = `<tr><td colspan="9" class="no-data"><span class="loader"></span> Cargando datos en tiempo real...</td></tr>`;
+            
+            // onSnapshot para escuchar cambios en tiempo real
+            onSnapshot(q, (snapshot) => {
+                const turistas = [];
+                snapshot.forEach((doc) => {
+                    turistas.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Ordenar por FechaRegistro descendente (último registro primero)
+                turistas.sort((a, b) => new Date(b.FechaRegistro) - new Date(a.FechaRegistro));
+
+                renderTable(turistas);
+                showMessage(`✅ Lista actualizada. Se muestran ${turistas.length} registros.`, true);
+            }, (error) => {
+                console.error("Error al obtener datos de Firestore:", error);
+                tableBody.innerHTML = `<tr><td colspan="9" class="no-data" style="color: #dc3545;">❌ Error: No se pudieron cargar los datos. (Revisa la consola)</td></tr>`;
+                showMessage(`Error: No se pudieron cargar los datos. Mensaje: ${error.message}`, false);
+            });
+        }
+        
+        function renderTable(turistas) {
+            const tableBody = document.getElementById('turistasTableBody');
+            tableBody.innerHTML = ''; 
+
+            if (turistas.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="9" class="no-data">No hay turistas registrados aún en la base de datos.</td></tr>`;
+                return;
+            }
+            
+            turistas.forEach(turista => {
+                const row = tableBody.insertRow();
+                
+                row.insertCell().textContent = turista.DNI_Carnet || '-';
+                row.insertCell().textContent = turista.Nombres || '-';
+                row.insertCell().textContent = turista.ApellidoPaterno || '-';
+                row.insertCell().textContent = turista.ApellidoMaterno || '-';
+                row.insertCell().textContent = turista.PaisOrigen || '-'; // Nuevo campo
+                row.insertCell().textContent = turista.Telefono || '-';
+                row.insertCell().textContent = turista.Sexo || '-';
+                row.insertCell().textContent = formatDate(turista.FechaRegistro);
+                // Mostrar solo los primeros 8 caracteres del UID para identificar al registrador
+                row.insertCell().textContent = turista.RegistradoPor ? turista.RegistradoPor.substring(0, 8) + '...' : 'Anónimo'; 
+            });
+        }
+
+    </script>
+
+    <div class="container-box">
+        <h2 class="text-center">REGISTRO DE TURISTAS KALLPA 3D</h2>
+        
+        <div id="userIdDisplay">Conectando...</div>
+        <div id="messageContainer" class="message-box"></div>
+        
+        <a href="formulario.html" class="btn btn-back">← Volver al Formulario</a>
+
+        <div class="table-responsive">
+            <table class="turistas-table">
+                <thead>
+                    <tr>
+                        <th>DNI/Carnet</th>
+                        <th>Nombres</th>
+                        <th>A. Paterno</th>
+                        <th>A. Materno</th>
+                        <th>País Origen</th>
+                        <th>Teléfono</th>
+                        <th>Sexo</th>
+                        <th>F. Registro</th>
+                        <th>ID Reg.</th>
+                    </tr>
+                </thead>
+                <tbody id="turistasTableBody">
+                    <!-- Los datos se insertarán aquí por JavaScript -->
+                    <tr><td colspan="9" class="no-data">Esperando conexión de Firebase...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

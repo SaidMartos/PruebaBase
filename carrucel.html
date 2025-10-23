@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kallpa 3D - Dicertur</title> 
+    <meta charset="utf-8">
+    
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+    <link rel="stylesheet" href="css/style.css">
+    
+    </head>
+<body>
+    
+    <div class="carousel-container">
+        <div class="carousel-track">
+            
+            <div class="carousel-card" data-index="1">
+                <img src="img/Cajamarca_cuarto_del_rescate.jpg" alt="Cuarto de Rescate" class="card-image">
+                <div class="card-info">
+                    <h2>Cuarto De Rescate</h2>
+                    <p>Visita el histórico lugar donde el Inca Atahualpa fue retenido.</p>
+                    <a href="Modelos 3D/Cuarto_De_Rescate/Cuarto_De_Rescate.html" class="card-link">Visitar Experiencia</a>
+                </div>
+            </div>
+
+            <div class="carousel-card" data-index="2">
+                <img src="img/Santa Apolonia.jpg" alt="Santa Apolonia" class="card-image">
+                <div class="card-info">
+                    <h2>Santa Apolonia</h2>
+                    <p>Contempla la ciudad de Cajamarca desde su mirador más emblemático.</p>
+                    <a href="Modelos 3D/Santa_Apolonia/Santa_Apolonia.html" class="card-link">Visitar Experiencia</a>
+                </div>
+            </div>
+
+            <div class="carousel-card" data-index="3">
+                <img src="img/Polloc.jpg" alt="Iglesia de Polloc" class="card-image">
+                <div class="card-info">
+                    <h2>Iglesia De Polloc</h2>
+                    <p>Admira el santuario conocido por su arte moderno y devoción popular.</p>
+                    <a href="Modelos 3D/Iglesia_Polloc/Iglesia_Polloc.html" class="card-link">Visitar Experiencia</a>
+                </div>
+            </div>
+            
+            <div class="carousel-card" data-index="4">
+                <img src="img/Ventanillas de Otuzco.jpg" alt="Ventanillas de Otuzco" class="card-image">
+                <div class="card-info">
+                    <h2>Ventanillas De Otuzco</h2>
+                    <p>Explora las enigmáticas tumbas nicho pre-incas talladas en roca volcánica.</p>
+                    <a href="Modelos 3D/Ventanillas_De_Otuzco/Ventanillas_De_Otuzco.html" class="card-link">Visitar Experiencia</a>
+                </div>
+            </div>
+            
+        </div>
+
+        <button class="carousel-button prev">❮</button>
+        <button class="carousel-button next">❯</button>
+    </div>
+    
+
+    
+    <div id="interaction-detector">
+        <div id="controls-top">
+            <button id="toggle-button" aria-label="Pausar/Reproducir Contador">
+                <span id="button-icon">⏸️</span>
+            </button>
+            <button id="reset-button" aria-label="Reiniciar Contadores">
+                <span id="reset-icon">⏹️</span>
+            </button>
+        </div>
+        <div class="counter-display">
+            <h2>Interacciones: <span id="contador-total">0</span></h2>
+        </div>
+        <p id="status-text">Estado: <strong id="current-status">Grabando</strong></p>
+    </div>
+
+
+    <script src="js/carousel.js"></script> 
+    <script type="module" src="js/counter.js"></script> 
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

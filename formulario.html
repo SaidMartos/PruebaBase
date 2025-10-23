@@ -5,13 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kallpa 3D - Registro de Turistas</title>
     
-    <!-- Importamos la fuente Inter de Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Estilos CSS Combinados -->
     <style>
-        /* (Se mantienen los estilos CSS del archivo original para la estética) */
-
         /* BASE DE SITE.CSS */
         body {
             margin: 0;
@@ -119,6 +115,7 @@
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.1s ease;
             font-family: 'Inter', sans-serif; 
+            margin-top: 10px; /* Añadido para separación entre botones */
         }
 
         .btn:active {
@@ -130,6 +127,7 @@
             background-color: #6c757d;
             color: white;
             width: 48%;
+            margin-top: 0; /* Lo reseteamos para los botones de acción */
         }
         
         .btn-clear:hover {
@@ -141,6 +139,7 @@
             background-color: #dc3545;
             color: white;
             width: 48%;
+            margin-top: 0; /* Lo reseteamos para los botones de acción */
         }
 
         .btn-register:hover {
@@ -161,18 +160,32 @@
             justify-content: space-between;
             gap: 10px;
             margin-top: 25px;
+            margin-bottom: 5px; /* Ajustado para dejar espacio con el nuevo botón */
         }
         
         /* Botón Ver Lista de Turistas */
         .btn-list {
             background-color: #17a2b8;
             color: white;
-            margin-top: 15px;
+            margin-top: 15px; /* Deja espacio si va debajo de otro botón */
             width: 100%;
         }
 
         .btn-list:hover {
             background-color: #138496;
+        }
+
+        /* Estilo para el nuevo botón del carrusel */
+        .btn-carousel {
+            background-color: #007bff; /* Un color azul llamativo, por ejemplo */
+            color: white;
+            width: 100%;
+            margin-bottom: 15px; /* Espacio antes del botón de lista */
+            font-size: 1.2rem;
+        }
+
+        .btn-carousel:hover {
+            background-color: #0056b3;
         }
 
         /* Botones flotantes (top-right-buttons) */
@@ -253,7 +266,6 @@
 </head>
 
 <body>
-    <!-- Importaciones de Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -268,9 +280,9 @@
         
         // Configuración de Firebase local/fallback (Asegúrate de que este sea el proyecto 'Prueba')
         const LOCAL_FIREBASE_CONFIG = {
-             apiKey: "AIzaSyBifMbYtOkxsijnaKlTtl_S_A5dkzE32BM", // Este key es de ejemplo, úsalo si no hay variables globales
+             apiKey: "AIzaSyBifMbYtOkxsijnaKlTtl_S_A5dkzE32BM", 
              authDomain: "prueba-ff7bb.firebaseapp.com",
-             projectId: "prueba-ff7bb", // <--- ESTE DEBE COINCIDIR CON TU PROYECTO
+             projectId: "prueba-ff7bb", 
              storageBucket: "prueba-ff7bb.appspot.com",
              messagingSenderId: "700600586061",
              appId: "1:700600586061:web:f1bfae76ae2ff3ed1db104"
@@ -311,12 +323,13 @@
                         if (initialAuthToken) {
                             await signInWithCustomToken(auth, initialAuthToken);
                         } else {
+                            // Si no hay token personalizado, intentamos anónimo.
+                            // Si el usuario cerró sesión, esta línea hará que se reautentique anónimamente.
                             await signInAnonymously(auth); 
                         }
                     } catch (error) {
-                         // Mostrar error si la autenticación falla
-                        showMessage("Error al autenticar. Verifica que la Autenticación de Firebase esté activa (Anónimo).", false);
-                        console.error("Firebase: Error al intentar autenticar:", error);
+                         showMessage("Error al autenticar. Verifica que la Autenticación de Firebase esté activa (Anónimo).", false);
+                         console.error("Firebase: Error al intentar autenticar:", error);
                     }
                 }
             });
@@ -349,14 +362,38 @@
             document.getElementById('messageContainer').style.display = 'none';
             document.getElementById('btnRegistrar').disabled = false;
         }
+        
+        // --- FUNCIÓN DE CIERRE DE SESIÓN ---
+        async function cerrarSesion() {
+            if (!auth) {
+                 showMessage("Autenticación no inicializada.", false);
+                 return;
+            }
+            try {
+                // 1. Cierra la sesión activa (anónima o con token)
+                await signOut(auth); 
+                console.log("Sesión cerrada con éxito.");
+
+                // 2. Muestra un mensaje y redirige al login (o a donde sea el punto de entrada)
+                showMessage("Sesión cerrada. Redirigiendo...", true);
+                
+                // Redirigir al login.html 
+                window.location.href = 'index.html'; 
+
+            } catch (error) {
+                showMessage(`Error al cerrar sesión: ${error.message}`, false);
+                console.error("Error al cerrar sesión:", error);
+            }
+        }
+
 
         // ----------------------------------------------------------------------------------
-        // 2. Lógica de Registro (Añadiendo try/catch más específico)
+        // 2. Lógica de Registro 
         // ----------------------------------------------------------------------------------
 
         async function registrarTurista() {
             if (!isAuthReady || !userId) {
-                showMessage("Autenticación no completa. Intenta nuevamente.", false);
+                showMessage("Autenticación no completa. Intenta nuevamente o recarga la página.", false);
                 return;
             }
             if (!db) {
@@ -376,9 +413,9 @@
                 Nombres: form.Nombres.value.trim(),
                 Telefono: form.Telefono.value.trim(),
                 Sexo: form.SexoSelect.value,
-                PaisOrigen: form.paisOrigenSelect.value, // Nuevo campo
-                FechaRegistro: new Date().toISOString(), // Usar ISO string para consistencia
-                RegistradoPor: userId // Guardar el UID del usuario que registra
+                PaisOrigen: form.paisOrigenSelect.value, 
+                FechaRegistro: new Date().toISOString(), 
+                RegistradoPor: userId 
             };
 
             // Validación simple
@@ -400,7 +437,6 @@
             } catch (error) {
                 console.error("Error al registrar turista en Firestore:", error);
                 
-                // Mostrar el error específico de permisos
                 if (error.code === 'permission-denied' || error.message.includes('insufficient permissions')) {
                     showMessage("❌ Error al guardar en la base de datos: Missing or insufficient permissions. (Revisa el AppId y las Reglas de Seguridad)", false);
                 } else {
@@ -415,22 +451,16 @@
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('btnRegistrar').addEventListener('click', registrarTurista);
             document.getElementById('btnClear').addEventListener('click', clearForm);
-            document.getElementById('btnCerrarSesion').addEventListener('click', async () => {
-                try {
-                    await signOut(auth);
-                    showMessage("Sesión cerrada.", true);
-                    window.location.reload(); // Recargar para iniciar sesión anónima
-                } catch (error) {
-                    showMessage(`Error al cerrar sesión: ${error.message}`, false);
-                }
-            });
+            
+            // Asignación del evento Cerrar Sesión
+            document.getElementById('btnCerrarSesion').addEventListener('click', cerrarSesion);
+            
+            // NOTA: El botón del carrusel es un simple enlace (<a>), no requiere JS adicional aquí.
         });
 
     </script>
-    <!-- ... (El resto del HTML sigue igual) ... -->
     
     <div class="top-right-buttons">
-        <!-- Estos botones no están implementados en este script, solo son visuales -->
         <button class="btn btn-register-user" disabled>Registrar nuevo usuario</button>
         <button id="btnCerrarSesion" class="btn btn-logout">Cerrar Sesión</button>
     </div>
@@ -439,41 +469,34 @@
         <h2 class="text-center">¡BIENVENIDO A LA FICHA DE REGISTRO!</h2>
         
         <div id="messageContainer" class="message-box" style="display: none;">
-            Error al guardar en la base de datos: Missing or insufficient permissions. (Revisa el AppId y las Reglas)
-        </div>
+            </div>
 
         <form id="registroForm">
-            <!-- DNI o Carnet de Extranjería -->
             <div class="form-group">
                 <label for="DNI_Carnet">D.N.I. o Carnet de Extranjería</label>
                 <input type="text" id="DNI_Carnet" name="DNI_Carnet" class="form-control" placeholder="Ingresar D.N.I." required>
             </div>
 
-            <!-- Apellido Paterno -->
             <div class="form-group">
                 <label for="ApellidoPaterno">Apellido Paterno</label>
                 <input type="text" id="ApellidoPaterno" name="ApellidoPaterno" class="form-control" required>
             </div>
 
-            <!-- Apellido Materno -->
             <div class="form-group">
                 <label for="ApellidoMaterno">Apellido Materno</label>
                 <input type="text" id="ApellidoMaterno" name="ApellidoMaterno" class="form-control">
             </div>
 
-            <!-- Nombres -->
             <div class="form-group">
                 <label for="Nombres">Nombres</label>
                 <input type="text" id="Nombres" name="Nombres" class="form-control" required>
             </div>
 
-            <!-- Teléfono -->
             <div class="form-group">
                 <label for="Telefono">Teléfono</label>
                 <input type="tel" id="Telefono" name="Telefono" class="form-control">
             </div>
 
-            <!-- Sexo -->
             <div class="form-group">
                 <label for="SexoSelect">Sexo</label>
                 <select id="SexoSelect" name="SexoSelect" class="form-control">
@@ -483,7 +506,6 @@
                 </select>
             </div>
 
-            <!-- País de Origen (Nuevo campo) -->
             <div class="form-group">
                 <label for="paisOrigenSelect">País de Origen</label>
                 <select id="paisOrigenSelect" name="paisOrigenSelect" class="form-control">
@@ -506,6 +528,8 @@
             </div>
             
         </form>
+        
+        <a href="carrucel.html" class="btn btn-carousel">Menú Carrusel de Escenarios 3D 🎠</a>
         
         <a href="lista_turistas.html" class="btn btn-list">Ver Lista de Turistas</a>
     </div>

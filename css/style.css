@@ -1,0 +1,254 @@
+/* ------------------------------------- */
+/* 1. ESTILOS BASE Y CONTROL DE SCROLL */
+/* ------------------------------------- */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden; /* Elimina scroll */
+    
+    color: white; 
+    font-family: Arial, sans-serif;
+    text-align: center;
+    
+    /* Configuración flexbox para centrar todo el contenido */
+    /* Este flexbox centrará el carrusel de nuevo */
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+}
+
+/* ❌ LOGO ELIMINADO - Ya no se necesitan estos estilos */
+
+/* ------------------------------------- */
+/* 2. CONFIGURACIÓN DEL FONDO (SIN ZOOM Y BLUR COMPLETO) */
+/* ------------------------------------- */
+body::before {
+    content: '';
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; 
+    
+    /* SOLUCIÓN AL BORDE SIN USAR ZOOM (scale): */
+    margin: -10px; 
+    padding: 10px; 
+    
+    /* Propiedades de la Imagen */
+    background-image: url('../img/plaza-de-armas-cajamarca.jpg'); 
+    background-size: cover; 
+    background-repeat: no-repeat; 
+    background-position: center center; 
+    
+    /* Nivel de Difuminado */
+    filter: blur(1.5px); 
+}
+
+
+/* ------------------------------------- */
+/* 3. ESTILOS DEL CARRUSEL Y TARJETAS */
+/* ------------------------------------- */
+
+.carousel-container {
+    width: 70vw; 
+    height: 75vh; 
+    max-height: 700px; 
+    position: relative;
+    overflow: hidden; 
+    border-radius: 50px; 
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    /* 🚩 CLAVE REVERTIDA: Eliminamos el margin-top para que el carrusel se centre de nuevo */
+    margin-top: 0; 
+}
+
+/* ... (El resto de los estilos permanece igual) ... */
+
+.carousel-track {
+    display: flex;
+    gap: 60px; 
+    padding: 10px 0; 
+    height: 100%; 
+    box-sizing: border-box;
+}
+
+.carousel-card {
+    min-width: calc(33.333% - 40px); 
+    box-sizing: border-box;
+    padding: 0; 
+    background: none; 
+    color: white; 
+    
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end; 
+    
+    border-radius: 35px; 
+    overflow: hidden;
+    height: 98%; 
+    position: relative; 
+}
+
+.card-image {
+    width: 100%;
+    height: 100%; 
+    object-fit: cover; 
+    position: absolute; 
+    top: 0;
+    left: 0;
+    z-index: 1; 
+    border-radius: 35px; 
+}
+
+.card-info {
+    position: relative; 
+    z-index: 2; 
+    padding: 20px;
+    text-align: center;
+    flex-grow: 0; 
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; 
+    width: 100%;
+    box-sizing: border-box;
+    
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.3) 70%, transparent 100%);
+    
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8);
+    
+    padding-bottom: 80px; 
+}
+
+.card-info h2 {
+    color: white; 
+    margin-top: 0;
+    font-size: 1.8em; 
+    margin-bottom: 10px;
+}
+
+.card-info p {
+    color: rgba(255, 255, 255, 0.9); 
+    margin-bottom: 15px; 
+    font-size: 1em; 
+}
+
+.card-link {
+    display: block; 
+    padding: 18px 20px; 
+    background-color: #DC3545; 
+    color: white;
+    text-decoration: none; 
+    border-radius: 15px;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.2s;
+    
+    position: absolute; 
+    bottom: 20px; 
+    left: 50%;
+    transform: translateX(-50%); 
+    z-index: 3; 
+    width: calc(100% - 40px); 
+    max-width: 250px; 
+}
+
+.card-link:hover {
+    background-color: #c82333;
+    transform: translateX(-50%) scale(1.03); 
+}
+
+/* ------------------------------------- */
+/* 4. ESTILOS DE NAVEGACIÓN (FLECHAS LATERALES) */
+/* ------------------------------------- */
+.carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 15px;
+    cursor: pointer;
+    font-size: 2em;
+    z-index: 10;
+    border-radius: 10px; 
+    transition: background-color 0.3s;
+}
+
+.carousel-button.prev {
+    left: 10px;
+}
+
+.carousel-button.next {
+    right: 10px;
+}
+
+.carousel-button:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+/* ------------------------------------- */
+/* 5. ESTILOS DEL DETECTOR FLOTANTE */
+/* ------------------------------------- */
+
+#interaction-detector {
+    /* Clave: Posiciona el elemento sobre todo lo demás */
+    position: fixed; 
+    top: 20px;
+    left: 20px;
+    
+    z-index: 1000; /* Asegura que esté por encima de todo */
+    
+    background-color: rgba(0, 0, 0, 0.75); /* Fondo semitransparente oscuro */
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    
+    font-family: Arial, sans-serif;
+    width: 200px; /* Ancho fijo para el detector */
+    text-align: center;
+}
+
+#controls-top {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+/* Reutilizamos los estilos de botones, pero ajustamos el color de los iconos */
+#interaction-detector button {
+    padding: 8px 10px !important;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+#interaction-detector span {
+    font-size: 1.4em !important;
+    vertical-align: middle;
+}
+
+/* Estilos de display para los contadores */
+.counter-display h2 {
+    color: white; /* Cambiamos el color para que se vea en fondo oscuro */
+    font-size: 1.4em;
+    margin: 5px 0 0;
+}
+
+.counter-display span {
+    color: #ffc107 !important; /* Amarillo para el número total */
+    font-size: 1.8em !important;
+    font-weight: bold;
+}
+
+
+#status-text {
+    font-size: 0.8em;
+    margin: 5px 0 0;
+}
+
+/* Estilos de botones (se mantienen los colores definidos antes) */
