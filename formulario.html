@@ -258,9 +258,29 @@
         
         // Variables globales (MANDATORIAS)
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // ----------------------------------------------------------------------------------
+        // ATENCIÓN: ESTA ES LA SECCIÓN QUE DEBES MODIFICAR PARA PROBAR FUERA DE CANVAS
+        // Reemplaza el contenido de 'LOCAL_FIREBASE_CONFIG' con tu configuración real de Firebase
+        // ----------------------------------------------------------------------------------
+        const LOCAL_FIREBASE_CONFIG = {
+             // DEBES PEGAR TU CONFIGURACIÓN AQUÍ SI ESTÁS FUERA DE LA PLATAFORMA
+             // Ejemplo:
+             // apiKey: "TU_API_KEY",
+             // authDomain: "TU_DOMINIO.firebaseapp.com",
+             // projectId: "TU_PROJECT_ID", // ESTO ES CLAVE
+             // storageBucket: "TU_BUCKET.appspot.com",
+             // messagingSenderId: "TUID",
+             // appId: "TUAPPID"
+        }; 
 
+        // ESTA LÍNEA PERMITE QUE FUNCIONE AQUÍ Y EN TU ENTORNO SI PEGAS LA CONFIG
+        const firebaseConfig = typeof __firebase_config !== 'undefined' && JSON.parse(__firebase_config).projectId 
+                               ? JSON.parse(__firebase_config) 
+                               : LOCAL_FIREBASE_CONFIG;
+        
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // ----------------------------------------------------------------------------------
+        
         let db, auth;
         let authReadyPromiseResolver;
         window.isAuthReadyPromise = new Promise(resolve => {
@@ -269,7 +289,9 @@
 
         // 1. Inicialización de Firebase
         try {
+            // El código de validación usa la nueva variable firebaseConfig, que ahora tiene el fallback
             if (!firebaseConfig.projectId) {
+                // Si incluso el fallback está vacío, se lanza el error (lo que viste antes)
                 throw new Error("La configuración de Firebase está incompleta. No se pudo obtener projectId.");
             }
             const app = initializeApp(firebaseConfig);
@@ -362,7 +384,7 @@
             
             <div class="form-actions">
                 <button type="button" class="btn btn-clear" id="btnLimpiarCampos">Limpiar Campos</button>
-                <button type="submit" class="btn btn-register" id="btnRegistrar" disabled>Cargando...</button>
+                <a href="lista_turistas.html" class="btn btn-register" id="btnRegistrar" disabled>Cargando...</a>
             </div>
             <p id="loadingStatus" style="text-align: center; color: #dc3545; margin-top: 10px; font-weight: 500;">Esperando conexión...</p>
         </form>
@@ -370,8 +392,8 @@
         <hr />
         
         <div class="d-flex-buttons">
-            <!-- Este botón debería ir a una nueva página, por ahora apunta a # -->
-            <button class="btn btn-list">Ver Lista de Turistas</button> 
+            <!-- Actualizado para enlazar a lista_turistas.html -->
+            <a href="lista_turistas.html" class="btn btn-list">Ver Lista de Turistas</a> 
         </div>
     </div>
 
@@ -380,7 +402,20 @@
         document.addEventListener('DOMContentLoaded', () => {
             const registroForm = document.querySelector('#registroForm');
             const btnLimpiarCampos = document.querySelector('#btnLimpiarCampos');
-            const btnRegistrar = document.querySelector('#btnRegistrar');
+            // Usamos una nueva variable para el botón de registro que SÍ es de tipo submit/button
+            const submitButton = document.createElement('button');
+            submitButton.setAttribute('type', 'submit');
+            submitButton.classList.add('btn', 'btn-register');
+            submitButton.id = 'btnSubmitRegistro';
+            
+            // Reemplazamos el 'a' (Ver Lista) temporalmente en la sección de acciones por un botón de submit funcional
+            const originalRegisterLink = document.getElementById('btnRegistrar');
+            const formActions = document.querySelector('.form-actions');
+            if (originalRegisterLink) {
+                 formActions.replaceChild(submitButton, originalRegisterLink);
+            }
+
+
             const messageContainer = document.querySelector('#messageContainer');
             const loadingStatus = document.querySelector('#loadingStatus');
 
@@ -424,15 +459,18 @@
             btnLimpiarCampos.addEventListener('click', limpiarCampos);
 
             // 3. Habilitar el Formulario una vez que la Autenticación Esté Lista
+            submitButton.disabled = true; // Aseguramos que esté deshabilitado al inicio
+            submitButton.textContent = 'Cargando...';
+
             window.isAuthReadyPromise.then(isReady => {
                 loadingStatus.style.display = 'none';
                 if (isReady && window.db) {
-                    btnRegistrar.disabled = false;
-                    btnRegistrar.textContent = 'Registrar Turista';
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Registrar Turista';
                     showMessage("Conexión con la base de datos establecida. Listo para registrar.", true);
                 } else {
-                    btnRegistrar.disabled = true;
-                    btnRegistrar.textContent = 'Error de Conexión';
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'Error de Conexión';
                     showMessage("Error de Conexión. Asegúrate que la configuración de Firebase sea válida (projectId no proporcionado).", false);
                 }
             });
@@ -445,7 +483,7 @@
                 messageContainer.style.display = 'none';
                 
                 // Doble chequeo de conexión antes de enviar
-                if (btnRegistrar.disabled || !window.db || !window.authUserId) {
+                if (submitButton.disabled || !window.db || !window.authUserId) {
                     showMessage("Error: La base de datos no está lista o el usuario no está autenticado.", false);
                     return;
                 }
@@ -468,8 +506,8 @@
                      return;
                 }
                 
-                btnRegistrar.disabled = true;
-                btnRegistrar.textContent = 'Guardando...';
+                submitButton.disabled = true;
+                submitButton.textContent = 'Guardando...';
 
                 // 2. Guardar datos en Firestore
                 try {
@@ -487,8 +525,8 @@
                     console.error("Error al registrar turista en Firestore:", error);
                     showMessage(`Error al guardar en la base de datos: ${error.message}`, false);
                 } finally {
-                    btnRegistrar.disabled = false;
-                    btnRegistrar.textContent = 'Registrar Turista';
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Registrar Turista';
                 }
             });
         });
