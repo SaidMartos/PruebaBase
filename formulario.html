@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kallpa 3D - Gestión de Nombres</title>
+    <!-- 1. LIBRERÍA XLSX (SheetJS) - NECESARIA PARA GENERAR ARCHIVOS .XLSX -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #dc3545;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            justify-content: center;
+        }
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 1rem;
+            max-width: 300px;
+        }
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        #btnGuardar {
+            background-color: #28a745; /* Verde */
+            color: white;
+        }
+        #btnGuardar:hover {
+            background-color: #218838;
+            transform: translateY(-1px);
+        }
+        #btnExportar {
+            background-color: #007bff; /* Azul */
+            color: white;
+            margin-left: 10px;
+        }
+        #btnExportar:hover {
+            background-color: #0069d9;
+            transform: translateY(-1px);
+        }
+        #mensaje {
+            margin-top: 15px;
+            font-weight: bold;
+            text-align: center;
+            color: #dc3545;
+        }
+        #tablaNombres {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 12px;
+            overflow: hidden; /* Para que los bordes redondeados afecten a la tabla */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        #tablaNombres th, #tablaNombres td {
+            padding: 15px;
+            text-align: left;
+        }
+        #tablaNombres th {
+            background-color: #dc3545;
+            color: white;
+            font-weight: 600;
+        }
+        #tablaNombres tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        #tablaNombres tbody tr:hover {
+            background-color: #ffe8e9;
+        }
+        /* Estilos para el ID de Usuario */
+        #userIdDisplay {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 10px;
+            word-break: break-all;
+            text-align: center;
+            border: 1px dashed #ced4da;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        /* Estilos de carga */
+        #loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+            color: #dc3545;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body onload="cargarNombresInicial()">
+    <div class="container">
+        <h1>Gestión de Nombres y Datos</h1>
+        
+        <div id="userIdDisplay">Cargando usuario...</div>
+
+        <div class="input-group">
+            <input type="text" id="inputNombre" placeholder="Ingresa un nuevo nombre">
+            <button id="btnGuardar" onclick="guardarNombre()">Guardar</button>
+            <button id="btnExportar" onclick="exportarTablaAExcel()">Exportar a Excel</button>
+        </div>
+        
+        <p id="mensaje"></p>
+
+        <h2>Nombres Registrados (Tiempo Real)</h2>
+        
+        <div id="loading">Conectando a Firebase...</div>
+
+        <table id="tablaNombres" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>ID del Documento</th>
+                    <th>Fecha de Registro</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Los datos se insertarán aquí por onSnapshot -->
+            </tbody>
+        </table>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, orderBy, setLogLevel } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // Configuración y Variables Globales (Uso de __app_id y __firebase_config)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { /* Configuración de Firebase de respaldo */ };
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        // Inicialización de Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        // Habilitar logs de debug (opcional, para desarrollo)
+        setLogLevel('debug');
+
+        let isAuthReady = false;
+        let userId = null;
+        let nombresCollectionPath = null;
+        const nombreInput = document.getElementById('inputNombre');
+        const mensaje = document.getElementById('mensaje');
+        const userIdDisplay = document.getElementById('userIdDisplay');
+        const loadingDiv = document.getElementById('loading');
+        const tablaNombres = document.getElementById('tablaNombres');
+
+        // =================================================================
+        // 1. AUTENTICACIÓN
+        // =================================================================
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Usuario autenticado o anónimo
+                userId = user.uid;
+                userIdDisplay.textContent = `ID de Usuario (UID): ${userId}`;
+                
+                // Ruta para datos privados: /artifacts/{appId}/users/{userId}/nombres_registrados
+                nombresCollectionPath = `artifacts/${appId}/users/${userId}/nombres_registrados`;
+                
+                isAuthReady = true;
+                
+                // Una vez autenticado, iniciamos la escucha en tiempo real
+                iniciarListenerNombres();
+            } else {
+                // Si no hay token inicial, intenta el inicio de sesión anónimo
+                try {
+                    if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (error) {
+                    console.error("Error en la autenticación:", error);
+                    userIdDisplay.textContent = "Error de autenticación. Revisa la consola.";
+                }
+            }
+        });
+
+        // =================================================================
+        // 2. LECTURA EN TIEMPO REAL (onSnapshot)
+        // =================================================================
+        function iniciarListenerNombres() {
+            if (!isAuthReady || !nombresCollectionPath) {
+                console.warn("Autenticación no lista para iniciar el listener de Firestore.");
+                return;
+            }
+
+            const nombresRef = collection(db, nombresCollectionPath);
+            
+            // Creamos un query para ordenar por fecha de forma descendente
+            const q = query(nombresRef, orderBy("fecha", "desc"));
+
+            // Escucha en tiempo real de la colección
+            onSnapshot(q, (querySnapshot) => {
+                const tbody = tablaNombres.querySelector('tbody');
+                tbody.innerHTML = ''; // Limpiar la tabla
+                loadingDiv.style.display = 'none';
+                tablaNombres.style.display = 'table';
+
+                if (querySnapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="3">No hay nombres registrados para este usuario.</td></tr>';
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const row = tbody.insertRow();
+                    
+                    row.insertCell().textContent = data.nombre;
+                    row.insertCell().textContent = doc.id; 
+                    row.insertCell().textContent = formatDate(data.fecha);
+                });
+
+            }, (error) => {
+                console.error("Error en onSnapshot: ", error);
+                loadingDiv.textContent = "❌ Error de conexión en tiempo real con la DB.";
+                tablaNombres.style.display = 'none';
+            });
+        }
+        
+        // Función auxiliar para formatear la fecha
+        const formatDate = (timestamp) => {
+            if (timestamp && timestamp.toDate) {
+                return timestamp.toDate().toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'medium' });
+            }
+            return 'N/A';
+        };
+
+        // =================================================================
+        // 3. ESCRITURA (Función Global)
+        // =================================================================
+        window.guardarNombre = async function() {
+            const nombre = nombreInput.value.trim();
+
+            if (!isAuthReady) {
+                mensaje.textContent = "Error: La aplicación no ha terminado de autenticarse.";
+                return;
+            }
+
+            if (nombre === "") {
+                mensaje.textContent = "Por favor, ingresa un nombre.";
+                return;
+            }
+
+            try {
+                const docRef = await addDoc(collection(db, nombresCollectionPath), {
+                    nombre: nombre,
+                    fecha: serverTimestamp() 
+                });
+
+                mensaje.textContent = `¡"${nombre}" guardado con éxito! ID: ${docRef.id} 🎉`;
+                nombreInput.value = ''; // Limpiar el campo
+                
+                // La tabla se actualizará automáticamente gracias a onSnapshot
+                
+            } catch (error) {
+                console.error("Error al escribir en Firestore: ", error);
+                mensaje.textContent = "❌ Error al guardar. Revisa la consola o las reglas de seguridad.";
+            }
+        }
+        
+        // =================================================================
+        // 4. EXPORTACIÓN (Función Global)
+        // =================================================================
+        window.exportarTablaAExcel = function() {
+            const table = document.getElementById('tablaNombres');
+            
+            if (typeof XLSX === 'undefined') {
+                mensaje.textContent = "Error: La librería de exportación (XLSX) no ha cargado correctamente.";
+                console.error("XLSX library not found. Check the CDN script tag.");
+                return;
+            }
+            if (table.querySelector('tbody').children.length === 0 || table.querySelector('tbody').textContent.includes('No hay nombres')) {
+                 mensaje.textContent = "No hay datos válidos para exportar.";
+                 return;
+            }
+
+
+            // Convertir la tabla HTML a un libro de trabajo (Workbook)
+            const workbook = XLSX.utils.table_to_book(table, { 
+                sheet: "Nombres Registrados",
+                raw: false 
+            });
+
+            // Escribir el archivo XLSX y forzar la descarga
+            const dateStr = new Date().toISOString().slice(0, 10);
+            const filename = `kallpa_nombres_${dateStr}.xlsx`;
+            
+            XLSX.writeFile(workbook, filename);
+            mensaje.textContent = `Archivo '${filename}' exportado con éxito.`;
+        }
+
+
+        // Función que se llama al cargar el body (solo sirve como punto de partida, el onAuthStateChanged hará el trabajo pesado)
+        window.cargarNombresInicial = function() {
+            // El listener se inicia automáticamente en onAuthStateChanged
+        }
+    </script>
+</body>
+</html>
