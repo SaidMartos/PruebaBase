@@ -8,7 +8,7 @@
     <!-- Importamos la fuente Inter de Google Fonts como sustituto -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Estilos CSS Combinados (registro_turistas.css + site.css adaptado) -->
+    <!-- Estilos CSS Combinados -->
     <style>
         /* BASE DE SITE.CSS */
         body {
@@ -258,8 +258,9 @@
         
         // Variables globales (MANDATORIAS)
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        
         // ----------------------------------------------------------------------------------
-        // ATENCIÓN: CONFIGURACIÓN DE FIREBASE PARA ENTORNO EXTERNO (COPIADA DEL USUARIO)
+        // ATENCIÓN: CONFIGURACIÓN DE FIREBASE PARA ENTORNO EXTERNO
         // ----------------------------------------------------------------------------------
         const LOCAL_FIREBASE_CONFIG = {
              apiKey: "AIzaSyBifMbYtOkxsijnaKlTtl_S_A5dkzE32BM",
@@ -270,9 +271,7 @@
              appId: "1:700600586061:web:f1bfae76ae2ff3ed1db104"
         }; 
 
-        // ESTA LÍNEA PERMITE QUE FUNCIONE EN AMBOS LUGARES: 
-        // 1. Usa la configuración de Canvas si está disponible.
-        // 2. Usa LOCAL_FIREBASE_CONFIG si se ejecuta en GitHub Pages.
+        // Esta línea permite que funcione en ambos lugares
         const firebaseConfig = typeof __firebase_config !== 'undefined' && JSON.parse(__firebase_config).projectId 
                                ? JSON.parse(__firebase_config) 
                                : LOCAL_FIREBASE_CONFIG;
@@ -288,9 +287,7 @@
 
         // 1. Inicialización de Firebase
         try {
-            // El código de validación usa la nueva variable firebaseConfig, que ahora tiene el fallback
             if (!firebaseConfig.projectId) {
-                // Si incluso el fallback está vacío, se lanza el error (lo que viste antes)
                 throw new Error("La configuración de Firebase está incompleta. No se pudo obtener projectId.");
             }
             const app = initializeApp(firebaseConfig);
@@ -325,7 +322,6 @@
 
         } catch (error) {
             console.error("Firebase Initialization Error:", error);
-            // Si la inicialización falla, resolvemos la promesa como false
             authReadyPromiseResolver(false);
             window.db = null;
         }
@@ -343,7 +339,7 @@
         
         <div id="messageContainer" class="message-box" style="display: none;"></div>
         
-        <!-- Formulario adaptado a HTML puro y con ID para JS -->
+        <!-- Formulario: Apellido Materno ahora es REQUIRED -->
         <form id="registroForm">
             
             <div class="form-group mb-3">
@@ -358,6 +354,7 @@
             
             <div class="form-group mb-3">
                 <label for="maternoInput">Apellido Materno</label>
+                <!-- AÑADIMOS 'required' AQUÍ -->
                 <input type="text" id="maternoInput" class="form-control" placeholder="Ingresar Apellido Materno" required />
             </div>
             
@@ -401,7 +398,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             const registroForm = document.querySelector('#registroForm');
             const btnLimpiarCampos = document.querySelector('#btnLimpiarCampos');
-            // Usamos una nueva variable para el botón de registro que SÍ es de tipo submit/button
+            
+            // Creamos un botón de submit funcional
             const submitButton = document.createElement('button');
             submitButton.setAttribute('type', 'submit');
             submitButton.classList.add('btn', 'btn-register');
@@ -413,7 +411,6 @@
             if (originalRegisterLink) {
                  formActions.replaceChild(submitButton, originalRegisterLink);
             }
-
 
             const messageContainer = document.querySelector('#messageContainer');
             const loadingStatus = document.querySelector('#loadingStatus');
@@ -443,7 +440,7 @@
                 for (let i = 0; i < elementos.length; i++) {
                     const elemento = elementos[i];
                     
-                    // Solo limpiar si no es el DNI
+                    // Limpia todos excepto el DNI (que a veces se mantiene para registros rápidos)
                     if (elemento.id !== "dniInput") {
                         if (elemento.tagName.toLowerCase() === 'input' || elemento.tagName.toLowerCase() === 'textarea') {
                             elemento.value = "";
@@ -470,7 +467,6 @@
                 } else {
                     submitButton.disabled = true;
                     submitButton.textContent = 'Error de Conexión';
-                    // Esto solo debería pasar si la configuración es incorrecta o hay un problema de red.
                     showMessage("Error de Conexión. Verifica la configuración de Firebase y la conexión a Internet.", false);
                 }
             });
@@ -489,20 +485,30 @@
                 }
 
                 // 1. Recolectar datos del formulario
+                
+                // CORRECCIÓN CLAVE: Usamos el operador || '' para garantizar que el valor siempre sea una cadena de texto,
+                // evitando el error 'reading indexOf' si el campo devuelve undefined.
+                const dniInput = document.querySelector('#dniInput').value || '';
+                const paternoInput = document.querySelector('#paternoInput').value || '';
+                const maternoInput = document.querySelector('#maternoInput').value || '';
+                const nombresInput = document.querySelector('#nombresInput').value || '';
+                const telefonoInput = document.querySelector('#telefonoInput').value || ''; // Aún si no es requerido
+                const sexoSelect = document.querySelector('#sexoSelect').value || '';
+                
                 const turistaData = {
-                    DNI_Carnet: document.querySelector('#dniInput').value.trim(),
-                    ApellidoPaterno: document.querySelector('#paternoInput').value.trim(),
-                    ApellidoMaterno: document.querySelector('#maternoInput').value.trim(),
-                    Nombres: document.querySelector('#nombresInput').value.trim(),
-                    Telefono: document.querySelector('#telefonoInput').value.trim(),
-                    Sexo: document.querySelector('#sexoSelect').value,
+                    DNI_Carnet: dniInput.trim(),
+                    ApellidoPaterno: paternoInput.trim(),
+                    ApellidoMaterno: maternoInput.trim(),
+                    Nombres: nombresInput.trim(),
+                    Telefono: telefonoInput.trim(),
+                    Sexo: sexoSelect,
                     FechaRegistro: new Date().toISOString(),
-                    RegistradoPor: window.authUserId, // Usamos el ID de usuario autenticado
+                    RegistradoPor: window.authUserId, 
                 };
                 
-                // Validación simple de campos requeridos
-                if (!turistaData.DNI_Carnet || !turistaData.ApellidoPaterno || !turistaData.Nombres || !turistaData.Sexo) {
-                     showMessage("Por favor, completa todos los campos requeridos.", false);
+                // Validación simple de campos requeridos (el HTML ya lo hace, pero es buena práctica)
+                if (!turistaData.DNI_Carnet || !turistaData.ApellidoPaterno || !turistaData.ApellidoMaterno || !turistaData.Nombres || !turistaData.Sexo) {
+                     showMessage("Por favor, completa todos los campos marcados como requeridos.", false);
                      return;
                 }
                 
@@ -520,6 +526,8 @@
                     
                     // Limpiamos el formulario después de un registro exitoso
                     registroForm.reset(); 
+                    // Aseguramos que el botón vuelve a estar activo
+                    document.querySelector('#sexoSelect').selectedIndex = 0;
 
                 } catch (error) {
                     console.error("Error al registrar turista en Firestore:", error);
