@@ -150,13 +150,16 @@
             const table = document.getElementById('tablaNombres');
             let csv = [];
             
+            // Usamos el punto y coma (;) como delimitador, que es el estándar para Excel en español.
+            const DELIMITER = ';'; 
+
             // 1. Obtener encabezados (<th>)
             const headers = [];
             table.querySelectorAll('thead th').forEach(th => {
-                // Limpiar espacios en blanco y añadir
-                headers.push(th.textContent.trim().replace(/,/g, ''));
+                // Limpiamos el texto de encabezado
+                headers.push(th.textContent.trim().replace(/"/g, '""'));
             });
-            csv.push(headers.join(',')); // Primera línea del CSV
+            csv.push(headers.join(DELIMITER)); // Unir encabezados con punto y coma
             
             // 2. Obtener filas de datos (<td>)
             table.querySelectorAll('tbody tr').forEach(row => {
@@ -164,8 +167,9 @@
                 row.querySelectorAll('td').forEach(cell => {
                     let cellData = cell.textContent.trim().replace(/"/g, '""');
                     
-                    // Si el dato contiene comas o saltos de línea, lo encerramos entre comillas dobles
-                    if (cellData.includes(',') || cellData.includes('\n')) {
+                    // Si el dato contiene el DELIMITER (punto y coma) o saltos de línea,
+                    // lo encerramos entre comillas dobles para que Excel lo maneje como un solo campo.
+                    if (cellData.includes(DELIMITER) || cellData.includes('\n')) {
                         cellData = `"${cellData}"`;
                     }
                     rowData.push(cellData);
@@ -173,7 +177,7 @@
                 
                 // Solo añadir la fila si tiene la misma cantidad de columnas que el encabezado (para evitar filas de error/mensaje)
                 if (rowData.length === headers.length) {
-                    csv.push(rowData.join(','));
+                    csv.push(rowData.join(DELIMITER)); // Unir datos con punto y coma
                 }
             });
 
