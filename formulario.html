@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kallpa 3D - Registro de Turistas</title>
+    
+    <!-- Importamos la fuente Inter de Google Fonts como sustituto -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Estilos CSS Combinados (registro_turistas.css + site.css adaptado) -->
+    <style>
+        /* BASE DE SITE.CSS */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif; /* Usamos Inter */
+            
+            background-image: url('img/plaza-de-armas-cajamarca.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
+            backdrop-filter: blur(1.5px);
+            
+            position: relative; 
+            min-height: 100vh;
+            display: flex; /* Centrado visual */
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px; /* Padding para móvil */
+        }
+
+        /* ESTILOS DEL CONTENEDOR PRINCIPAL (registro_turistas.css) */
+        .container-box {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            box-sizing: border-box;
+            position: relative; 
+            margin: auto;
+        }
+
+        h2 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+            font-size: 1.8rem;
+        }
+
+        /* Estilos de los grupos de formulario */
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600; /* Semibold */
+            color: #555;
+            font-size: 1rem;
+        }
+        
+        /* Estilos de los campos de entrada y selección */
+        .form-control {
+            width: 100%;
+            padding: 12px 17px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1.1rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500; /* Medium */
+            letter-spacing: 0.5px; /* Adaptado para Inter */
+        }
+
+        .form-control::placeholder {
+            color: #999;
+        }
+        
+        /* Estilos para los botones */
+        .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 16px;
+            font-size: 1.2rem; /* Ligeramente reducido para el botón de limpiar */
+            font-weight: 600; /* Semibold */
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-family: 'Inter', sans-serif; 
+            box-shadow: none;
+        }
+        
+        /* Botón de limpiar */
+        .btn-clear {
+            background-color: #6c757d;
+            color: white;
+            margin-top: 5px;
+            width: 48%;
+            padding: 10px;
+            font-size: 1rem;
+        }
+        
+        .btn-clear:hover {
+            background-color: #5a6268;
+        }
+        
+        /* Botón de Registrar */
+        .btn-register {
+            background-color: #dc3545;
+            color: white;
+            margin-top: 5px;
+            width: 48%;
+        }
+
+        .btn-register:hover {
+            background-color: #c82333;
+        }
+        
+        /* Botón de Registro Deshabilitado */
+        .btn-register:disabled {
+            background-color: #e0e0e0;
+            color: #a0a0a0;
+            cursor: not-allowed;
+        }
+
+        /* Contenedor de botones de Limpiar/Registrar */
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        /* Botón Ver Lista de Turistas */
+        .btn-list {
+            background-color: #dc3545;
+            color: white;
+            margin-top: 10px;
+            width: 100%;
+            padding: 14px;
+            font-size: 1.2rem;
+            border-radius: 16px;
+        }
+
+        .btn-list:hover {
+            background-color: #c82333;
+        }
+
+        /* Botones flotantes (top-right-buttons) */
+        .top-right-buttons {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .top-right-buttons .btn-register-user,
+        .top-right-buttons .btn-logout {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-family: 'Inter', sans-serif; 
+            font-weight: 600;
+        }
+
+        .top-right-buttons .btn-logout {
+            background-color: #dc3545;
+        }
+
+        .top-right-buttons .btn-register-user:hover {
+            background-color: #218838;
+        }
+
+        .top-right-buttons .btn-logout:hover {
+            background-color: #c82333;
+        }
+
+        /* Elementos de interfaz */
+        hr {
+            margin-top: 25px;
+            margin-bottom: 25px;
+            border: 0;
+            border-top: 2px solid #ddd;
+        }
+        
+        /* Mensajes de feedback */
+        .message-box {
+            padding: 12px 17px;
+            border-radius: 6px;
+            margin-bottom: 19px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .message-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* Para móvil */
+        @media (max-width: 600px) {
+            .form-actions {
+                flex-direction: column;
+            }
+            .btn-clear, .btn-register {
+                width: 100%;
+            }
+            .top-right-buttons {
+                position: static;
+                margin-bottom: 20px;
+                flex-direction: row;
+                justify-content: space-around;
+            }
+            .container-box {
+                padding: 20px;
+            }
+            body {
+                align-items: flex-start; /* Permite desplazamiento si el formulario es largo */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Importaciones de Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        setLogLevel('Debug'); // Para ver logs en la consola
+        
+        // Variables globales (MANDATORIAS)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let db, auth;
+        let authReadyPromiseResolver;
+        window.isAuthReadyPromise = new Promise(resolve => {
+            authReadyPromiseResolver = resolve;
+        });
+
+        // 1. Inicialización de Firebase
+        try {
+            if (!firebaseConfig.projectId) {
+                throw new Error("La configuración de Firebase está incompleta. No se pudo obtener projectId.");
+            }
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+
+            window.db = db;
+            window.collection = collection;
+            window.addDoc = addDoc;
+
+            // 2. Manejo de Autenticación
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    console.log(`Firebase: Usuario autenticado. UID: ${user.uid}`);
+                    window.authUserId = user.uid; // Exportar el ID de usuario
+                    authReadyPromiseResolver(true);
+                } else {
+                    // Si no está autenticado, intentar la autenticación inicial
+                    try {
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } else {
+                            // Usar autenticación anónima como fallback para acceder a datos públicos
+                            await signInAnonymously(auth); 
+                        }
+                    } catch (error) {
+                        console.error("Firebase: Error al intentar autenticar anónimamente:", error);
+                        authReadyPromiseResolver(false); // Falla la autenticación
+                    }
+                }
+            });
+
+        } catch (error) {
+            console.error("Firebase Initialization Error:", error);
+            // Si la inicialización falla, resolvemos la promesa como false
+            authReadyPromiseResolver(false);
+            window.db = null;
+        }
+
+    </script>
+
+    <div class="top-right-buttons">
+        <!-- Estos botones redirigen al index.html y al mismo formulario.html (simulando registro de usuario) -->
+        <a href="formulario.html" class="btn btn-register-user">Registrar nuevo usuario</a>
+        <a href="index.html" class="btn btn-logout">Cerrar Sesión</a>
+    </div>
+
+    <div class="container-box">
+        <h2 class="text-center">¡Bienvenido a la Ficha de Registro!</h2>
+        
+        <div id="messageContainer" class="message-box" style="display: none;"></div>
+        
+        <!-- Formulario adaptado a HTML puro y con ID para JS -->
+        <form id="registroForm">
+            
+            <div class="form-group mb-3">
+                <label for="dniInput">D.N.I. o Carnet de Extranjería</label>
+                <input type="text" id="dniInput" class="form-control" placeholder="Ingresar D.N.I." required />
+            </div>
+            
+            <div class="form-group mb-3">
+                <label for="paternoInput">Apellido Paterno</label>
+                <input type="text" id="paternoInput" class="form-control" placeholder="Ingresar Apellido Paterno" required />
+            </div>
+            
+            <div class="form-group mb-3">
+                <label for="maternoInput">Apellido Materno</label>
+                <input type="text" id="maternoInput" class="form-control" placeholder="Ingresar Apellido Materno" required />
+            </div>
+            
+            <div class="form-group mb-3">
+                <label for="nombresInput">Nombres</label>
+                <input type="text" id="nombresInput" class="form-control" placeholder="Ingresar Nombres" required />
+            </div>
+            
+            <div class="form-group mb-3">
+                <label for="telefonoInput">Teléfono</label>
+                <input type="tel" id="telefonoInput" class="form-control" placeholder="Ingresar tu teléfono" />
+            </div>
+            
+            <div class="form-group mb-3">
+                <label for="sexoSelect">Sexo</label>
+                <select id="sexoSelect" class="form-control" required>
+                    <option value="" disabled selected>Selecciona tu Sexo</option>
+                    <option value="Masculino">Masculino</option>
+                    <option value="Femenino">Femenino</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-clear" id="btnLimpiarCampos">Limpiar Campos</button>
+                <button type="submit" class="btn btn-register" id="btnRegistrar" disabled>Cargando...</button>
+            </div>
+            <p id="loadingStatus" style="text-align: center; color: #dc3545; margin-top: 10px; font-weight: 500;">Esperando conexión...</p>
+        </form>
+
+        <hr />
+        
+        <div class="d-flex-buttons">
+            <!-- Este botón debería ir a una nueva página, por ahora apunta a # -->
+            <button class="btn btn-list">Ver Lista de Turistas</button> 
+        </div>
+    </div>
+
+    <script>
+        // Lógica de JavaScript
+        document.addEventListener('DOMContentLoaded', () => {
+            const registroForm = document.querySelector('#registroForm');
+            const btnLimpiarCampos = document.querySelector('#btnLimpiarCampos');
+            const btnRegistrar = document.querySelector('#btnRegistrar');
+            const messageContainer = document.querySelector('#messageContainer');
+            const loadingStatus = document.querySelector('#loadingStatus');
+
+            // --- Funciones de Utilidad ---
+            
+            function showMessage(message, isSuccess) {
+                messageContainer.textContent = message;
+                messageContainer.className = 'message-box';
+                
+                if (isSuccess) {
+                    messageContainer.classList.add('message-success');
+                } else {
+                    messageContainer.classList.add('message-error');
+                }
+                messageContainer.style.display = 'block';
+                // Ocultar después de 5 segundos
+                setTimeout(() => {
+                    messageContainer.style.display = 'none';
+                }, 5000);
+            }
+            
+            // Función de Limpiar Campos
+            function limpiarCampos() {
+                const elementos = registroForm.elements;
+
+                for (let i = 0; i < elementos.length; i++) {
+                    const elemento = elementos[i];
+                    
+                    // Solo limpiar si no es el DNI
+                    if (elemento.id !== "dniInput") {
+                        if (elemento.tagName.toLowerCase() === 'input' || elemento.tagName.toLowerCase() === 'textarea') {
+                            elemento.value = "";
+                        } else if (elemento.tagName.toLowerCase() === 'select') {
+                            elemento.selectedIndex = 0; // Selecciona la primera opción (desactivada)
+                        }
+                    }
+                }
+                showMessage("Campos de Apellidos, Nombres, Teléfono y Sexo limpiados.", true);
+            }
+            
+            btnLimpiarCampos.addEventListener('click', limpiarCampos);
+
+            // 3. Habilitar el Formulario una vez que la Autenticación Esté Lista
+            window.isAuthReadyPromise.then(isReady => {
+                loadingStatus.style.display = 'none';
+                if (isReady && window.db) {
+                    btnRegistrar.disabled = false;
+                    btnRegistrar.textContent = 'Registrar Turista';
+                    showMessage("Conexión con la base de datos establecida. Listo para registrar.", true);
+                } else {
+                    btnRegistrar.disabled = true;
+                    btnRegistrar.textContent = 'Error de Conexión';
+                    showMessage("Error de Conexión. Asegúrate que la configuración de Firebase sea válida (projectId no proporcionado).", false);
+                }
+            });
+
+
+            // --- Lógica de Firebase Firestore para el Registro ---
+            
+            registroForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                messageContainer.style.display = 'none';
+                
+                // Doble chequeo de conexión antes de enviar
+                if (btnRegistrar.disabled || !window.db || !window.authUserId) {
+                    showMessage("Error: La base de datos no está lista o el usuario no está autenticado.", false);
+                    return;
+                }
+
+                // 1. Recolectar datos del formulario
+                const turistaData = {
+                    DNI_Carnet: document.querySelector('#dniInput').value.trim(),
+                    ApellidoPaterno: document.querySelector('#paternoInput').value.trim(),
+                    ApellidoMaterno: document.querySelector('#maternoInput').value.trim(),
+                    Nombres: document.querySelector('#nombresInput').value.trim(),
+                    Telefono: document.querySelector('#telefonoInput').value.trim(),
+                    Sexo: document.querySelector('#sexoSelect').value,
+                    FechaRegistro: new Date().toISOString(),
+                    RegistradoPor: window.authUserId, // Usamos el ID de usuario autenticado
+                };
+                
+                // Validación simple de campos requeridos
+                if (!turistaData.DNI_Carnet || !turistaData.ApellidoPaterno || !turistaData.Nombres || !turistaData.Sexo) {
+                     showMessage("Por favor, completa todos los campos requeridos.", false);
+                     return;
+                }
+                
+                btnRegistrar.disabled = true;
+                btnRegistrar.textContent = 'Guardando...';
+
+                // 2. Guardar datos en Firestore
+                try {
+                    // Usamos la colección 'turistas' en el path público
+                    const turistasColRef = window.collection(window.db, 'artifacts', window.appId, 'public', 'data', 'turistas');
+                    
+                    await window.addDoc(turistasColRef, turistaData);
+
+                    showMessage(`¡Turista ${turistaData.Nombres} registrado con éxito!`, true);
+                    
+                    // Limpiamos el formulario después de un registro exitoso
+                    registroForm.reset(); 
+
+                } catch (error) {
+                    console.error("Error al registrar turista en Firestore:", error);
+                    showMessage(`Error al guardar en la base de datos: ${error.message}`, false);
+                } finally {
+                    btnRegistrar.disabled = false;
+                    btnRegistrar.textContent = 'Registrar Turista';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
