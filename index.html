@@ -17,13 +17,23 @@
             border: 1px solid #ccc;
         }
         button {
-            background-color: #4CAF50;
-            color: white;
             cursor: pointer;
             border: none;
+            transition: background-color 0.3s;
         }
-        button:hover {
+        #btnGuardar {
+            background-color: #4CAF50; /* Verde */
+            color: white;
+        }
+        #btnGuardar:hover {
             background-color: #45a049;
+        }
+        #btnExportar {
+            background-color: #008CBA; /* Azul */
+            color: white;
+        }
+        #btnExportar:hover {
+            background-color: #007bb5;
         }
         #tablaNombres {
             width: 80%;
@@ -50,10 +60,15 @@
 
     <h1>Guardar mi Nombre en Firebase</h1>
     <input type="text" id="inputNombre" placeholder="Ingresa tu nombre">
-    <button onclick="guardarNombre()">Guardar en DB</button>
+    <button id="btnGuardar" onclick="guardarNombre()">Guardar en DB</button>
     <p id="mensaje"></p>
 
     <h2>Nombres Registrados</h2>
+    <!-- Nuevo botón de exportar -->
+    <button id="btnExportar" onclick="exportarTablaAExcel()" style="margin-bottom: 15px;">
+        Descargar a Excel (CSV)
+    </button>
+    
     <table id="tablaNombres">
         <thead>
             <tr>
@@ -70,7 +85,6 @@
     <script type="module">
         // 1. Importar las funciones necesarias desde el SDK de Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        // Importamos getDocs, query, y orderBy para la LECTURA de datos
         import { getFirestore, collection, addDoc, serverTimestamp, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // 2. Tu configuración de Firebase
@@ -86,7 +100,7 @@
         // 3. Inicializar Firebase y Firestore
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app); 
-        const nombresRef = collection(db, "nombres_registrados"); // Referencia a la colección
+        const nombresRef = collection(db, "nombres_registrados");
         
         // Función auxiliar para formatear la fecha
         const formatDate = (timestamp) => {
@@ -101,14 +115,13 @@
         // =================================================================
         async function cargarNombres() {
             const tbody = document.getElementById('tablaNombres').querySelector('tbody');
-            tbody.innerHTML = '<tr><td colspan="3">Cargando datos...</td></tr>'; // Indicador de carga
+            tbody.innerHTML = '<tr><td colspan="3">Cargando datos...</td></tr>'; 
 
             try {
-                // Consulta: Obtiene todos los documentos, ordenados por fecha descendente
                 const q = query(nombresRef, orderBy("fecha", "desc"));
                 const querySnapshot = await getDocs(q);
 
-                tbody.innerHTML = ''; // Limpiar el indicador de carga
+                tbody.innerHTML = '';
 
                 if (querySnapshot.empty) {
                     tbody.innerHTML = '<tr><td colspan="3">No hay nombres registrados.</td></tr>';
@@ -119,24 +132,74 @@
                     const data = doc.data();
                     const row = tbody.insertRow();
                     
-                    // Columna 1: Nombre
                     row.insertCell().textContent = data.nombre;
-
-                    // Columna 2: ID del Documento
                     row.insertCell().textContent = doc.id; 
-                    
-                    // Columna 3: Fecha (usando la función de formato)
                     row.insertCell().textContent = formatDate(data.fecha);
                 });
 
             } catch (error) {
                 console.error("Error al cargar los nombres: ", error);
-                tbody.innerHTML = '<tr><td colspan="3">❌ Error al conectar con la base de datos. Revisa las reglas de seguridad.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="3">❌ Error al conectar con la base de datos.</td></tr>';
             }
         }
 
         // =================================================================
-        // FUNCIÓN DE ESCRITURA: Guarda el nombre y luego actualiza la tabla
+        // FUNCIÓN DE EXPORTACIÓN: Convierte la tabla a CSV y fuerza la descarga
+        // =================================================================
+        window.exportarTablaAExcel = function() {
+            const table = document.getElementById('tablaNombres');
+            let csv = [];
+            
+            // 1. Obtener encabezados (<th>)
+            const headers = [];
+            table.querySelectorAll('thead th').forEach(th => {
+                // Limpiar espacios en blanco y añadir
+                headers.push(th.textContent.trim().replace(/,/g, ''));
+            });
+            csv.push(headers.join(',')); // Primera línea del CSV
+            
+            // 2. Obtener filas de datos (<td>)
+            table.querySelectorAll('tbody tr').forEach(row => {
+                const rowData = [];
+                row.querySelectorAll('td').forEach(cell => {
+                    let cellData = cell.textContent.trim().replace(/"/g, '""');
+                    
+                    // Si el dato contiene comas o saltos de línea, lo encerramos entre comillas dobles
+                    if (cellData.includes(',') || cellData.includes('\n')) {
+                        cellData = `"${cellData}"`;
+                    }
+                    rowData.push(cellData);
+                });
+                
+                // Solo añadir la fila si tiene la misma cantidad de columnas que el encabezado (para evitar filas de error/mensaje)
+                if (rowData.length === headers.length) {
+                    csv.push(rowData.join(','));
+                }
+            });
+
+            // 3. Crear el archivo Blob y descargar
+            const csvString = csv.join('\n');
+            // Agregamos el prefijo BOM para asegurar que Excel reconozca correctamente los caracteres especiales (UTF-8)
+            const BOM = "\uFEFF"; 
+            const blob = new Blob([BOM + csvString], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            
+            // Simular el clic en un enlace de descarga
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            // Nombre del archivo de descarga
+            link.setAttribute('download', 'nombres_firestore_' + new Date().toISOString().slice(0, 10) + '.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            URL.revokeObjectURL(url); // Liberar el recurso Blob
+        }
+
+
+        // =================================================================
+        // FUNCIÓN DE ESCRITURA
         // =================================================================
         window.guardarNombre = async function() {
             const nombreInput = document.getElementById('inputNombre');
@@ -149,19 +212,16 @@
             }
 
             try {
-                // Guarda el nuevo documento
                 const docRef = await addDoc(nombresRef, {
                     nombre: nombre,
-                    // Usamos serverTimestamp() para que Firebase ponga la hora del servidor
                     fecha: serverTimestamp() 
                 });
 
                 mensaje.textContent = `¡"${nombre}" guardado! 🎉`;
-                nombreInput.value = ''; // Limpiar el campo
+                nombreInput.value = '';
                 
-                // ¡Paso clave! Después de guardar, recarga la tabla
-                await cargarNombres();
-
+                await cargarNombres(); // Recargar la tabla
+                
             } catch (error) {
                 console.error("Error al escribir en Firestore: ", error);
                 mensaje.textContent = "❌ Error al guardar. Revisa la consola.";
@@ -169,7 +229,7 @@
         }
         
         // =================================================================
-        // FUNCIÓN DE INICIO: Se llama con el onload del body para la carga inicial
+        // FUNCIÓN DE INICIO
         // =================================================================
         window.cargarNombresInicial = function() {
             cargarNombres();
