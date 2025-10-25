@@ -78,6 +78,18 @@
             font-size: 1rem;
         }
         
+        /* Contenedor de DNI/Carnet para poner select y input en fila */
+        .document-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .document-input-group select,
+        .document-input-group input {
+            /* Asegura que ambos tomen el espacio disponible */
+            flex-grow: 1; 
+        }
+
         /* Estilos de los campos de entrada y selección */
         .form-control {
             width: 100%;
@@ -198,7 +210,6 @@
             z-index: 10;
         }
         
-        .top-right-buttons .btn-register-user,
         .top-right-buttons .btn-logout {
             padding: 8px 12px;
             font-size: 0.9rem;
@@ -207,16 +218,8 @@
             width: auto;
         }
         
-        .top-right-buttons .btn-register-user {
-            background-color: #28a745;
-        }
-
         .top-right-buttons .btn-logout {
             background-color: #dc3545;
-        }
-        
-        .top-right-buttons .btn-register-user:hover {
-            background-color: #218838;
         }
 
         .top-right-buttons .btn-logout:hover {
@@ -247,19 +250,19 @@
             border-color: #c3e6cb;
         }
 
-        /* Estilo para mostrar el ID de usuario */
+        /* Estilo para mostrar el ID de usuario (Oculto) */
         #userIdDisplay {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.75rem;
-            color: #000;
-            background-color: rgba(255, 255, 255, 0.7);
-            padding: 5px 10px;
-            border-radius: 5px;
-            z-index: 2;
-            white-space: nowrap;
+            display: none; 
+        }
+        
+        /* Estilo para agrupar campos pequeños (Teléfono y Edad) en una línea */
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1; /* Distribuye el espacio equitativamente */
         }
         
     </style>
@@ -271,27 +274,25 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        setLogLevel('Debug'); // Habilitar logs para depuración
+        setLogLevel('Debug'); 
 
         // ----------------------------------------------------------------------------------
-        // CONFIGURACIÓN DE FIREBASE (Asegurando robustez en el entorno Canvas/GitHub)
+        // CONFIGURACIÓN DE FIREBASE
         // ----------------------------------------------------------------------------------
         const appId = (typeof __app_id !== 'undefined' && __app_id) ? String(__app_id) : 'github-pages-default-id';
         
-        // Configuración de Firebase local/fallback (Asegúrate de que este sea el proyecto 'Prueba')
         const LOCAL_FIREBASE_CONFIG = {
-             apiKey: "AIzaSyBifMbYtOkxsijnaKlTtl_S_A5dkzE32BM", 
-             authDomain: "prueba-ff7bb.firebaseapp.com",
-             projectId: "prueba-ff7bb", 
-             storageBucket: "prueba-ff7bb.appspot.com",
-             messagingSenderId: "700600586061",
-             appId: "1:700600586061:web:f1bfae76ae2ff3ed1db104"
+            apiKey: "AIzaSyBifMbYtOkxsijnaKlTtl_S_A5dkzE32BM", 
+            authDomain: "prueba-ff7bb.firebaseapp.com",
+            projectId: "prueba-ff7bb", 
+            storageBucket: "prueba-ff7bb.appspot.com",
+            messagingSenderId: "700600586061",
+            appId: "1:700600586061:web:f1bfae76ae2ff3ed1db104"
         }; 
 
-        // Usamos la configuración de Canvas si está disponible y es válida, sino usamos el fallback
         const firebaseConfig = typeof __firebase_config !== 'undefined' && JSON.parse(__firebase_config).projectId 
-                               ? JSON.parse(__firebase_config) 
-                               : LOCAL_FIREBASE_CONFIG;
+                                ? JSON.parse(__firebase_config) 
+                                : LOCAL_FIREBASE_CONFIG;
         
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
         
@@ -315,21 +316,18 @@
                 if (user) {
                     userId = user.uid;
                     isAuthReady = true;
-                    document.getElementById('userIdDisplay').textContent = `Usuario ID: ${userId} | App ID: ${appId}`;
-                    console.log(`Firebase: Usuario autenticado. UID: ${userId}`);
+                    console.log(`Firebase: Usuario autenticado. UID: ${userId}`); 
                 } else {
                     // Intento de autenticación inicial (Custom Token o Anónimo)
                     try {
                         if (initialAuthToken) {
                             await signInWithCustomToken(auth, initialAuthToken);
                         } else {
-                            // Si no hay token personalizado, intentamos anónimo.
-                            // Si el usuario cerró sesión, esta línea hará que se reautentique anónimamente.
                             await signInAnonymously(auth); 
                         }
                     } catch (error) {
-                         showMessage("Error al autenticar. Verifica que la Autenticación de Firebase esté activa (Anónimo).", false);
-                         console.error("Firebase: Error al intentar autenticar:", error);
+                            showMessage("Error al autenticar. Verifica que la Autenticación de Firebase esté activa (Anónimo).", false);
+                            console.error("Firebase: Error al intentar autenticar:", error);
                     }
                 }
             });
@@ -359,25 +357,25 @@
 
         function clearForm() {
             document.getElementById('registroForm').reset();
+            document.getElementById('TipoDocumentoSelect').value = "DNI"; // Valor por defecto
+            document.getElementById('DNI_Carnet').maxLength = 8; // Restablece límite DNI
+            document.getElementById('paisOrigenSelect').value = "Peru";
+            document.getElementById('otroPaisGroup').style.display = 'none';
+            document.getElementById('otroPaisInput').value = '';
+            document.getElementById('SexoSelect').value = ""; 
             document.getElementById('messageContainer').style.display = 'none';
             document.getElementById('btnRegistrar').disabled = false;
         }
         
-        // --- FUNCIÓN DE CIERRE DE SESIÓN ---
         async function cerrarSesion() {
             if (!auth) {
-                 showMessage("Autenticación no inicializada.", false);
-                 return;
+                    showMessage("Autenticación no inicializada.", false);
+                    return;
             }
             try {
-                // 1. Cierra la sesión activa (anónima o con token)
                 await signOut(auth); 
                 console.log("Sesión cerrada con éxito.");
-
-                // 2. Muestra un mensaje y redirige al login (o a donde sea el punto de entrada)
                 showMessage("Sesión cerrada. Redirigiendo...", true);
-                
-                // Redirigir al login.html 
                 window.location.href = 'index.html'; 
 
             } catch (error) {
@@ -385,51 +383,213 @@
                 console.error("Error al cerrar sesión:", error);
             }
         }
+        
+        // --- FUNCIÓN PARA CAMBIAR EL LÍMITE DE DIGITOS ---
+        function handleDocumentTypeChange() {
+            const tipoDoc = document.getElementById('TipoDocumentoSelect').value;
+            const inputDoc = document.getElementById('DNI_Carnet');
+            inputDoc.value = ''; // Limpiamos el campo al cambiar el tipo
+            
+            if (tipoDoc === 'DNI') {
+                inputDoc.maxLength = 8;
+                inputDoc.placeholder = "Ingresar 8 dígitos del D.N.I.";
+            } else if (tipoDoc === 'Carnet') {
+                inputDoc.maxLength = 12;
+                inputDoc.placeholder = "Ingresar Carnet de Extranjería (máx. 12)";
+            } else {
+                inputDoc.maxLength = 12; // Valor por defecto
+                inputDoc.placeholder = "Ingresar Documento";
+            }
+        }
+        
+        // --- FUNCIÓN PARA MOSTRAR CAMPO OTRO PAÍS ---
+        function handlePaisChange() {
+            const pais = document.getElementById('paisOrigenSelect').value;
+            const otroPaisGroup = document.getElementById('otroPaisGroup');
+            
+            if (pais === 'Otro') {
+                otroPaisGroup.style.display = 'block';
+            } else {
+                otroPaisGroup.style.display = 'none';
+                document.getElementById('otroPaisInput').value = ''; // Limpiar si se oculta
+            }
+        }
+        
+        // --- FUNCIÓN DE VALIDACIÓN DE TEXTO (Solo Letras y Espacios) ---
+        function validateLettersOnly(event) {
+            const pattern = /^[a-zA-Z\u00C0-\u017F\s]*$/; 
+            const value = event.target.value;
+            
+            if (!pattern.test(value)) {
+                event.target.value = value.replace(/[^a-zA-Z\u00C0-\u017F\s]/g, '');
+                // Comentado para no saturar con mensajes: showMessage("Solo se permiten letras y espacios en este campo.", false);
+            }
+        }
+
+        // --- FUNCIÓN DE VALIDACIÓN DE NÚMEROS (Solo Dígitos) ---
+        function validateNumbersOnly(event) {
+            const pattern = /^\d*$/;
+            const value = event.target.value;
+
+            if (!pattern.test(value)) {
+                event.target.value = value.replace(/[^\d]/g, '');
+                // Comentado para no saturar con mensajes: showMessage("Solo se permiten números en este campo.", false);
+            }
+        }
 
 
         // ----------------------------------------------------------------------------------
-        // 2. Lógica de Registro 
+        // 2. Lógica de Registro (CON VALIDACIÓN MEJORADA)
         // ----------------------------------------------------------------------------------
+        
+        function isFieldEmpty(value) {
+            return value === null || value === undefined || (typeof value === 'string' && value.trim() === '');
+        }
+        
+        function isValidNameOrLastName(value) {
+            const pattern = /^[a-zA-Z\u00C0-\u017F\s]+$/; 
+            return pattern.test(value.trim());
+        }
+        
+        function isValidDocumentNumber(value) {
+            const pattern = /^\d+$/; 
+            return pattern.test(value.trim());
+        }
+        
+        // Nuevo: Función para validar Edad
+        function isValidAge(value) {
+             const age = value.trim();
+             // Debe ser un número, no vacío, y estar entre 1 y 99 (máx 2 dígitos)
+             return isValidDocumentNumber(age) && age.length >= 1 && age.length <= 2 && parseInt(age, 10) > 0;
+        }
 
         async function registrarTurista() {
+            const btnRegistrar = document.getElementById('btnRegistrar');
+            btnRegistrar.disabled = true;
+
             if (!isAuthReady || !userId) {
                 showMessage("Autenticación no completa. Intenta nuevamente o recarga la página.", false);
+                btnRegistrar.disabled = false;
                 return;
             }
             if (!db) {
                 showMessage("Base de datos no inicializada.", false);
+                btnRegistrar.disabled = false;
                 return;
             }
             
-            document.getElementById('btnRegistrar').disabled = true;
-            showMessage("Registrando turista...", true);
-
             const form = document.getElementById('registroForm');
-            
+            const tipoDoc = form.TipoDocumentoSelect.value;
+            const paisOrigen = form.paisOrigenSelect.value;
+            const otroPais = form.otroPaisInput.value.trim(); 
+
             const turistaData = {
+                TipoDocumento: tipoDoc,
                 DNI_Carnet: form.DNI_Carnet.value.trim(),
                 ApellidoPaterno: form.ApellidoPaterno.value.trim(),
                 ApellidoMaterno: form.ApellidoMaterno.value.trim(),
                 Nombres: form.Nombres.value.trim(),
+                Edad: form.Edad.value.trim(), // Nuevo Campo
                 Telefono: form.Telefono.value.trim(),
                 Sexo: form.SexoSelect.value,
-                PaisOrigen: form.paisOrigenSelect.value, 
+                PaisOrigen: paisOrigen === 'Otro' ? otroPais : paisOrigen, 
                 FechaRegistro: new Date().toISOString(), 
                 RegistradoPor: userId 
             };
 
-            // Validación simple
-            if (!turistaData.DNI_Carnet || !turistaData.Nombres || !turistaData.ApellidoPaterno) {
-                showMessage("Por favor, complete los campos obligatorios (DNI, Nombres, Apellido Paterno).", false);
-                document.getElementById('btnRegistrar').disabled = false;
+            // === LÓGICA DE VALIDACIÓN ESTRICTA DE TODOS LOS CAMPOS ===
+            let camposVacios = [];
+            
+            // 1. VALIDACIÓN DE CAMPOS VACÍOS
+            if (isFieldEmpty(turistaData.DNI_Carnet)) camposVacios.push(tipoDoc);
+            if (isFieldEmpty(turistaData.ApellidoPaterno)) camposVacios.push("Apellido Paterno");
+            if (isFieldEmpty(turistaData.ApellidoMaterno)) camposVacios.push("Apellido Materno");
+            if (isFieldEmpty(turistaData.Nombres)) camposVacios.push("Nombres");
+            if (isFieldEmpty(turistaData.Edad)) camposVacios.push("Edad"); // Validación Edad
+            if (isFieldEmpty(turistaData.Telefono)) camposVacios.push("Teléfono");
+            if (isFieldEmpty(turistaData.Sexo)) camposVacios.push("Sexo");
+            
+            if (isFieldEmpty(paisOrigen)) {
+                 camposVacios.push("País de Origen");
+            } else if (paisOrigen === 'Otro' && isFieldEmpty(otroPais)) {
+                camposVacios.push("Especificar País"); 
+            }
+
+            if (camposVacios.length > 0) {
+                showMessage(`❌ Faltan los siguientes campos obligatorios: ${camposVacios.join(', ')}.`, false);
+                btnRegistrar.disabled = false;
+                return; 
+            }
+            
+            // 2. VALIDACIÓN DE FORMATO DE CARACTERES
+            
+            // Validación de DNI/Carnet y Teléfono: Solo números
+            if (!isValidDocumentNumber(turistaData.DNI_Carnet)) {
+                showMessage(`❌ El campo ${tipoDoc} solo debe contener números.`, false);
+                btnRegistrar.disabled = false;
                 return;
             }
+            if (!isValidDocumentNumber(turistaData.Telefono)) {
+                showMessage(`❌ El campo Teléfono solo debe contener números.`, false);
+                btnRegistrar.disabled = false;
+                return;
+            }
+            // Validación de Edad: Solo números y formato correcto
+            if (!isValidAge(turistaData.Edad)) {
+                showMessage(`❌ La Edad debe ser un número válido de 1 o 2 dígitos (ej: 25).`, false);
+                btnRegistrar.disabled = false;
+                return;
+            }
+
+            // Validación de Nombres/Apellidos/Otro País: Solo letras/espacios
+            if (!isValidNameOrLastName(turistaData.ApellidoPaterno)) {
+                showMessage(`❌ Apellido Paterno solo debe contener letras.`, false);
+                btnRegistrar.disabled = false;
+                return;
+            }
+            if (!isValidNameOrLastName(turistaData.ApellidoMaterno)) {
+                showMessage(`❌ Apellido Materno solo debe contener letras.`, false);
+                btnRegistrar.disabled = false;
+                return;
+            }
+            if (!isValidNameOrLastName(turistaData.Nombres)) {
+                showMessage(`❌ Nombres solo debe contener letras.`, false);
+                btnRegistrar.disabled = false;
+                return;
+            }
+            if (paisOrigen === 'Otro' && !isValidNameOrLastName(otroPais)) {
+                showMessage(`❌ El campo 'Especificar País' solo debe contener letras.`, false);
+                btnRegistrar.disabled = false;
+                return;
+            }
+            
+            // 3. VALIDACIÓN DE LONGITUD DEL DOCUMENTO
+            const lenDoc = turistaData.DNI_Carnet.length;
+            if (tipoDoc === 'DNI' && lenDoc !== 8) {
+                showMessage(`❌ El DNI debe tener exactamente 8 dígitos. Ingresaste ${lenDoc}.`, false);
+                btnRegistrar.disabled = false;
+                return;
+            }
+            if (tipoDoc === 'Carnet' && (lenDoc < 6 || lenDoc > 12)) {
+                showMessage(`❌ El Carnet de Extranjería debe tener entre 6 y 12 dígitos. Ingresaste ${lenDoc}.`, false);
+                btnRegistrar.disabled = false;
+                return;
+            }
+            // =========================================================
+
+            showMessage("Registrando turista...", true);
 
             try {
                 // RUTA CRÍTICA: artifacts/{appId}/public/data/turistas
                 const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'turistas');
                 
-                await addDoc(colRef, turistaData);
+                // Excluir el campo de otroPais si se usó un país de la lista
+                const dataToSave = {...turistaData};
+                if (paisOrigen !== 'Otro') {
+                    delete dataToSave.OtroPais; // Se elimina del objeto si no es necesario
+                }
+                
+                await addDoc(colRef, dataToSave);
 
                 showMessage("✅ Turista registrado exitosamente.", true);
                 clearForm();
@@ -443,7 +603,7 @@
                     showMessage(`❌ Error de Firestore: ${error.message}`, false);
                 }
                 
-                document.getElementById('btnRegistrar').disabled = false;
+                btnRegistrar.disabled = false;
             }
         }
 
@@ -451,17 +611,29 @@
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('btnRegistrar').addEventListener('click', registrarTurista);
             document.getElementById('btnClear').addEventListener('click', clearForm);
-            
-            // Asignación del evento Cerrar Sesión
             document.getElementById('btnCerrarSesion').addEventListener('click', cerrarSesion);
             
-            // NOTA: El botón del carrusel es un simple enlace (<a>), no requiere JS adicional aquí.
+            // Eventos para límites de dígitos
+            document.getElementById('TipoDocumentoSelect').addEventListener('change', handleDocumentTypeChange);
+            document.getElementById('paisOrigenSelect').addEventListener('change', handlePaisChange);
+            
+            // Eventos de Validación en tiempo real (input)
+            document.getElementById('DNI_Carnet').addEventListener('input', validateNumbersOnly);
+            document.getElementById('Telefono').addEventListener('input', validateNumbersOnly);
+            document.getElementById('Edad').addEventListener('input', validateNumbersOnly); // Nuevo
+            
+            document.getElementById('ApellidoPaterno').addEventListener('input', validateLettersOnly);
+            document.getElementById('ApellidoMaterno').addEventListener('input', validateLettersOnly);
+            document.getElementById('Nombres').addEventListener('input', validateLettersOnly);
+            document.getElementById('otroPaisInput').addEventListener('input', validateLettersOnly);
+            
+            // Inicializar el límite de DNI al cargar la página (8 digitos por defecto)
+            handleDocumentTypeChange();
         });
 
     </script>
     
     <div class="top-right-buttons">
-        <button class="btn btn-register-user" disabled>Registrar nuevo usuario</button>
         <button id="btnCerrarSesion" class="btn btn-logout">Cerrar Sesión</button>
     </div>
 
@@ -473,33 +645,47 @@
 
         <form id="registroForm">
             <div class="form-group">
-                <label for="DNI_Carnet">D.N.I. o Carnet de Extranjería</label>
-                <input type="text" id="DNI_Carnet" name="DNI_Carnet" class="form-control" placeholder="Ingresar D.N.I." required>
+                <label for="TipoDocumentoSelect">Documento de Identidad</label>
+                <div class="document-input-group">
+                    <select id="TipoDocumentoSelect" name="TipoDocumentoSelect" class="form-control" required>
+                        <option value="DNI" selected>D.N.I. (8 digitos)</option>
+                        <option value="Carnet">Carnet de Extranjería (12 digitos)</option>
+                    </select>
+                    <input type="text" id="DNI_Carnet" name="DNI_Carnet" class="form-control" placeholder="Ingresar D.N.I." maxlength="8" inputmode="numeric" required>
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="ApellidoPaterno">Apellido Paterno</label>
-                <input type="text" id="ApellidoPaterno" name="ApellidoPaterno" class="form-control" required>
+                <input type="text" id="ApellidoPaterno" name="ApellidoPaterno" class="form-control" maxlength="50" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*" required>
             </div>
 
             <div class="form-group">
                 <label for="ApellidoMaterno">Apellido Materno</label>
-                <input type="text" id="ApellidoMaterno" name="ApellidoMaterno" class="form-control">
+                <input type="text" id="ApellidoMaterno" name="ApellidoMaterno" class="form-control" maxlength="50" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*" required>
             </div>
 
             <div class="form-group">
                 <label for="Nombres">Nombres</label>
-                <input type="text" id="Nombres" name="Nombres" class="form-control" required>
+                <input type="text" id="Nombres" name="Nombres" class="form-control" maxlength="50" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*" required>
             </div>
-
-            <div class="form-group">
-                <label for="Telefono">Teléfono</label>
-                <input type="tel" id="Telefono" name="Telefono" class="form-control">
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="Telefono">Teléfono</label>
+                    <input type="tel" id="Telefono" name="Telefono" class="form-control" maxlength="15" inputmode="numeric" pattern="[0-9]*" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="Edad">Edad</label>
+                    <input type="text" id="Edad" name="Edad" class="form-control" maxlength="2" inputmode="numeric" pattern="[0-9]*" placeholder="Ej: 25" required>
+                </div>
             </div>
-
+            
             <div class="form-group">
                 <label for="SexoSelect">Sexo</label>
-                <select id="SexoSelect" name="SexoSelect" class="form-control">
+                <select id="SexoSelect" name="SexoSelect" class="form-control" required>
+                    <option value="" disabled selected>-- Seleccionar Sexo --</option>
                     <option value="Masculino">Masculino</option>
                     <option value="Femenino">Femenino</option>
                     <option value="Otro">Otro</option>
@@ -508,7 +694,8 @@
 
             <div class="form-group">
                 <label for="paisOrigenSelect">País de Origen</label>
-                <select id="paisOrigenSelect" name="paisOrigenSelect" class="form-control">
+                <select id="paisOrigenSelect" name="paisOrigenSelect" class="form-control" required>
+                    <option value="" disabled>-- Seleccionar País --</option>
                     <option value="Peru" selected>Perú</option>
                     <option value="Colombia">Colombia</option>
                     <option value="Ecuador">Ecuador</option>
@@ -520,6 +707,11 @@
                     <option value="EEUU">Estados Unidos</option>
                     <option value="Otro">Otro</option>
                 </select>
+            </div>
+            
+            <div class="form-group" id="otroPaisGroup" style="display: none;">
+                <label for="otroPaisInput">Especificar País</label>
+                <input type="text" id="otroPaisInput" name="otroPaisInput" class="form-control" maxlength="50" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*" placeholder="Especifique el país">
             </div>
 
             <div class="form-actions">
