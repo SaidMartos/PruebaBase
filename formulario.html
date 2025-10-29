@@ -139,23 +139,24 @@
             background-color: #6c757d;
             color: white;
             width: 48%;
-            margin-top: 0; /* Lo reseteamos para los botones de acción */
+            margin-top: 0; 
         }
         
         .btn-clear:hover {
             background-color: #5a6268;
         }
         
-        /* Botón de Registrar */
+        /* Botón de Registrar/Acceder Carrusel (Anteriormente btn-register) */
         .btn-register {
-            background-color: #dc3545;
+            background-color: #007bff; /* Nuevo color unificado */
             color: white;
             width: 48%;
-            margin-top: 0; /* Lo reseteamos para los botones de acción */
+            margin-top: 0; 
+            font-size: 1.1rem; /* Ajustado para consistencia */
         }
 
         .btn-register:hover {
-            background-color: #c82333;
+            background-color: #0056b3; /* Hover del nuevo color */
         }
         
         /* Botón de Registro Deshabilitado */
@@ -172,14 +173,14 @@
             justify-content: space-between;
             gap: 10px;
             margin-top: 25px;
-            margin-bottom: 5px; /* Ajustado para dejar espacio con el nuevo botón */
+            margin-bottom: 5px; 
         }
         
         /* Botón Ver Lista de Turistas */
         .btn-list {
             background-color: #17a2b8;
             color: white;
-            margin-top: 15px; /* Deja espacio si va debajo de otro botón */
+            margin-top: 15px; 
             width: 100%;
         }
 
@@ -187,18 +188,7 @@
             background-color: #138496;
         }
 
-        /* Estilo para el nuevo botón del carrusel */
-        .btn-carousel {
-            background-color: #007bff; /* Un color azul llamativo, por ejemplo */
-            color: white;
-            width: 100%;
-            margin-bottom: 15px; /* Espacio antes del botón de lista */
-            font-size: 1.2rem;
-        }
-
-        .btn-carousel:hover {
-            background-color: #0056b3;
-        }
+        /* ELIMINADOS ESTILOS .btn-carousel y .btn-carousel:hover */
 
         /* Botones flotantes (top-right-buttons) */
         .top-right-buttons {
@@ -291,8 +281,8 @@
         }; 
 
         const firebaseConfig = typeof __firebase_config !== 'undefined' && JSON.parse(__firebase_config).projectId 
-                                ? JSON.parse(__firebase_config) 
-                                : LOCAL_FIREBASE_CONFIG;
+                                     ? JSON.parse(__firebase_config) 
+                                     : LOCAL_FIREBASE_CONFIG;
         
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
         
@@ -369,8 +359,8 @@
         
         async function cerrarSesion() {
             if (!auth) {
-                    showMessage("Autenticación no inicializada.", false);
-                    return;
+                        showMessage("Autenticación no inicializada.", false);
+                        return;
             }
             try {
                 await signOut(auth); 
@@ -422,7 +412,6 @@
             
             if (!pattern.test(value)) {
                 event.target.value = value.replace(/[^a-zA-Z\u00C0-\u017F\s]/g, '');
-                // Comentado para no saturar con mensajes: showMessage("Solo se permiten letras y espacios en este campo.", false);
             }
         }
 
@@ -433,13 +422,12 @@
 
             if (!pattern.test(value)) {
                 event.target.value = value.replace(/[^\d]/g, '');
-                // Comentado para no saturar con mensajes: showMessage("Solo se permiten números en este campo.", false);
             }
         }
 
 
         // ----------------------------------------------------------------------------------
-        // 2. Lógica de Registro (CON VALIDACIÓN MEJORADA)
+        // 2. Lógica de Registro (CON REDIRECCIÓN AL CARRUSEL)
         // ----------------------------------------------------------------------------------
         
         function isFieldEmpty(value) {
@@ -456,11 +444,11 @@
             return pattern.test(value.trim());
         }
         
-        // Nuevo: Función para validar Edad
+        // Función para validar Edad
         function isValidAge(value) {
-             const age = value.trim();
-             // Debe ser un número, no vacío, y estar entre 1 y 99 (máx 2 dígitos)
-             return isValidDocumentNumber(age) && age.length >= 1 && age.length <= 2 && parseInt(age, 10) > 0;
+              const age = value.trim();
+              // Debe ser un número, no vacío, y estar entre 1 y 99 (máx 2 dígitos)
+              return isValidDocumentNumber(age) && age.length >= 1 && age.length <= 2 && parseInt(age, 10) > 0;
         }
 
         async function registrarTurista() {
@@ -489,7 +477,7 @@
                 ApellidoPaterno: form.ApellidoPaterno.value.trim(),
                 ApellidoMaterno: form.ApellidoMaterno.value.trim(),
                 Nombres: form.Nombres.value.trim(),
-                Edad: form.Edad.value.trim(), // Nuevo Campo
+                Edad: form.Edad.value.trim(),
                 Telefono: form.Telefono.value.trim(),
                 Sexo: form.SexoSelect.value,
                 PaisOrigen: paisOrigen === 'Otro' ? otroPais : paisOrigen, 
@@ -505,7 +493,7 @@
             if (isFieldEmpty(turistaData.ApellidoPaterno)) camposVacios.push("Apellido Paterno");
             if (isFieldEmpty(turistaData.ApellidoMaterno)) camposVacios.push("Apellido Materno");
             if (isFieldEmpty(turistaData.Nombres)) camposVacios.push("Nombres");
-            if (isFieldEmpty(turistaData.Edad)) camposVacios.push("Edad"); // Validación Edad
+            if (isFieldEmpty(turistaData.Edad)) camposVacios.push("Edad");
             if (isFieldEmpty(turistaData.Telefono)) camposVacios.push("Teléfono");
             if (isFieldEmpty(turistaData.Sexo)) camposVacios.push("Sexo");
             
@@ -577,7 +565,7 @@
             }
             // =========================================================
 
-            showMessage("Registrando turista...", true);
+            showMessage("Registrando turista y redirigiendo al carrusel...", true);
 
             try {
                 // RUTA CRÍTICA: artifacts/{appId}/public/data/turistas
@@ -586,13 +574,16 @@
                 // Excluir el campo de otroPais si se usó un país de la lista
                 const dataToSave = {...turistaData};
                 if (paisOrigen !== 'Otro') {
-                    delete dataToSave.OtroPais; // Se elimina del objeto si no es necesario
+                    // El campo OtroPais no se incluyó en turistaData, solo se utiliza 'PaisOrigen'
                 }
                 
                 await addDoc(colRef, dataToSave);
 
-                showMessage("✅ Turista registrado exitosamente.", true);
-                clearForm();
+                // **PASO CLAVE: REDIRECCIÓN EXITOSA**
+                showMessage("✅ Turista registrado exitosamente. Accediendo al carrusel...", true);
+                setTimeout(() => {
+                    window.location.href = 'carrucel.html'; // Redirige al carrusel
+                }, 1500); // Espera 1.5 segundos para mostrar el mensaje de éxito
                 
             } catch (error) {
                 console.error("Error al registrar turista en Firestore:", error);
@@ -620,7 +611,7 @@
             // Eventos de Validación en tiempo real (input)
             document.getElementById('DNI_Carnet').addEventListener('input', validateNumbersOnly);
             document.getElementById('Telefono').addEventListener('input', validateNumbersOnly);
-            document.getElementById('Edad').addEventListener('input', validateNumbersOnly); // Nuevo
+            document.getElementById('Edad').addEventListener('input', validateNumbersOnly);
             
             document.getElementById('ApellidoPaterno').addEventListener('input', validateLettersOnly);
             document.getElementById('ApellidoMaterno').addEventListener('input', validateLettersOnly);
@@ -716,12 +707,10 @@
 
             <div class="form-actions">
                 <button type="button" id="btnClear" class="btn btn-clear">Limpiar Campos</button>
-                <button type="button" id="btnRegistrar" class="btn btn-register">Registrar Turista</button>
+                <button type="button" id="btnRegistrar" class="btn btn-register">Registrar y Acceder al Carrusel 🎠</button>
             </div>
             
         </form>
-        
-        <a href="carrucel.html" class="btn btn-carousel">Menú Carrusel de Escenarios 3D 🎠</a>
         
         <a href="lista_turistas.html" class="btn btn-list">Ver Lista de Turistas</a>
     </div>

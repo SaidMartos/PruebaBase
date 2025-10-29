@@ -250,5 +250,35 @@ body::before {
     font-size: 0.8em;
     margin: 5px 0 0;
 }
+#interaction-detector .btn-finish {
+    /* Diseño Básico */
+    width: 100%;
+    padding: 10px 15px;
+    margin-top: 10px;
+    
+    /* Fuente */
+    font-size: 1em;
+    font-weight: bold;
+    color: white; /* Texto blanco */
+    
+    /* Color de Fondo llamativo */
+    background-color: #d9534f; /* Rojo/Naranja de alerta */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 
+    /* Animación simple al pasar el mouse */
+    transition: background-color 0.2s ease;
+}
+
+#interaction-detector .btn-finish:hover {
+    background-color: #c9302c; /* Rojo más oscuro al pasar el mouse */
+}
+
+/* Ajuste general del detector para darle espacio al nuevo botón */
+#interaction-detector {
+    /* ... Tus estilos anteriores ... */
+    padding: 15px; /* Aumenta un poco el padding si es necesario */
+}
 /* Estilos de botones (se mantienen los colores definidos antes) */
