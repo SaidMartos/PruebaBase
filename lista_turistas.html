@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kallpa 3D - Lista de Turistas</title>
+    <title>Kallpa 3D - Lista De Usuarios</title>
     
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon"> 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -36,7 +37,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5); 
+            background-color: rgba(0, 0, 0, 0); 
             backdrop-filter: blur(2px);
             z-index: 0;
         }
@@ -48,7 +49,7 @@
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             width: 100%;
-            max-width: 1000px; /* Ancho mayor para la tabla */
+            max-width: 1300px; /* Ancho mayor para la tabla */
             box-sizing: border-box;
             position: relative; 
             margin: 40px auto;
@@ -60,9 +61,9 @@
             font-weight: 800;
             text-align: center;
             margin-bottom: 25px;
-            color: #17a2b8; /* Azul/Cyan */
+            color: #dc3545; /* Azul/Cyan */
             font-size: 2.2rem;
-            text-transform: uppercase;
+            /*text-transform: uppercase;*/
         }
 
         /* MENSAJES DE FEEDBACK */
@@ -162,7 +163,7 @@
         }
 
         .turistas-table th {
-            background-color: #17a2b8;
+            background-color: #dc3545;
             color: white;
             font-weight: 700;
             text-transform: uppercase;
@@ -206,7 +207,7 @@
         /* Loader simple */
         .loader {
             border: 4px solid #f3f3f3;
-            border-top: 4px solid #17a2b8;
+            border-top: 4px solid #dc3545;
             border-radius: 50%;
             width: 20px;
             height: 20px;
@@ -432,7 +433,7 @@
     </script>
 
     <div class="container-box">
-        <h2 class="text-center">REGISTRO DE TURISTAS KALLPA 3D</h2>
+        <h2 class="text-center">Registro De Usuarios De Kallpa 3D</h2>
         
         <div id="messageContainer" class="message-box"></div>
         

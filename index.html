@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kallpa 3D - Login</title>
     
-    <!-- Importamos Font Awesome para el ícono de ojo -->
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon"> 
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     
-    <!-- CSS CONSOLIDADO (site.css + login.css) -->
     <style>
         /* --- ESTILOS DE SITE.CSS ADAPTADOS --- */
         
@@ -52,10 +52,9 @@
             margin-bottom: 33px;
         }
 
-        /* Eliminamos el estilo .login-logo ya que usaremos <img> directamente en HTML */
-        /* para una mejor compatibilidad con la ruta src */
+        /* ESTILO DEL LOGO: Aumentado 50% */
         .login-logo-img {
-            width: 150px;
+            width: 3500px; /* ¡CAMBIADO: 150px + 50% = 225px! */
             height: auto;
             max-width: 100%;
         }
@@ -111,7 +110,7 @@
         #togglePassword {
             position: absolute;
             right: 17px;
-            top: 60%;
+            top: 66%; 
             transform: translateY(-50%);
             cursor: pointer;
             font-size: 1.5rem;
@@ -187,7 +186,6 @@
 <body>
     <div class="login-box">
         <div class="login-header">
-            <!-- Usamos <img> directamente para cargar el logo -->
             <img 
                 src="img/Ministerio_De_Cultura.png" 
                 alt="Logo Kallpa 3D" 
@@ -199,8 +197,7 @@
         <h2>¡Bienvenido a Kallpa 3D!</h2>
         
         <div id="errorContainer" style="display: none;">
-            <!-- El mensaje de error se insertará aquí con JS -->
-        </div>
+            </div>
         
         <form id="loginForm" method="post" class="w-100">
             <div class="form-group">
@@ -213,8 +210,6 @@
                 <input type="password" id="passwordInput" class="form-control" placeholder="Ingresa tu contraseña" required />
                 <i class="far fa-eye" id="togglePassword"></i>
             </div>
-
-            <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
 
             <button type="submit" class="login-button">Ingresar</button>
         </form>

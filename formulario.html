@@ -3,30 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kallpa 3D - Registro de Turistas</title>
-    
+    <title>Kallpa 3D - Registro de Usuarios</title> 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon"> 
+    
     <style>
-        /* BASE DE SITE.CSS */
+        /* BASE DE SITE.CSS (ESTILOS MODIFICADOS PARA EL FONDO DEL LOGIN) */
         body {
             margin: 0;
             padding: 0;
             font-family: 'Inter', sans-serif;
             background-color: #f0f0f0; 
+            
+            /* PROPIEDADES COPIADAS DEL LOGIN */
             background-image: url('img/plaza-de-armas-cajamarca.jpg');
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center center;
             background-attachment: fixed;
+            backdrop-filter: blur(1.5px); /* FILTRO DE DESENFOQUE PRINCIPAL (como en el login) */
+            /* FIN PROPIEDADES COPIADAS */
+            
             position: relative; 
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 40px 20px;
+            /* padding: 14px 20px; <-- ELIMINADO PARA UN CENTRADO PERFECTO */
+            min-height: 100vh;
+            overflow: hidden; /* SE MANTIENE EL 'hidden' (sin scroll) */
+            box-sizing: border-box; /* Añadido para consistencia */
         }
 
+        /* CAPA DE SOMBRA SEMITRANSPARENTE (AUMENTADA LA OPACIDAD A 0.5) */
         body::before {
             content: '';
             position: absolute;
@@ -34,8 +44,8 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(2px);
+            /* CAMBIO CLAVE: Aumentado a 0.5 para un efecto más oscuro */
+            background-color: rgba(0, 0, 0, 0); 
             z-index: 0;
         }
 
@@ -46,21 +56,25 @@
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             width: 100%;
-            max-width: 450px;
+            max-width: 500px;
             box-sizing: border-box;
             position: relative; 
             margin: auto;
             z-index: 1;
+            bottom: 40px;
+            /* 'scale' MOVIDO AQUÍ para el efecto zoom */
+            transform: scale(0.9); 
         }
 
-        h2 {
+h2 {
             font-family: 'Inter', sans-serif;
             font-weight: 800;
             text-align: center;
-            margin-bottom: 25px;
+            margin-top: 8px;
+            margin-bottom: 15px; /* Reducido de 25px a 15px */
             color: #dc3545;
-            font-size: 2rem;
-            text-transform: uppercase;
+            font-size: 1.9rem; /* CAMBIO CLAVE: Reducido de 2rem a 1.5rem */
+           /* text-transform: capitalize;*/
         }
 
         /* Estilos de los grupos de formulario */
@@ -127,18 +141,18 @@
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.1s ease;
             font-family: 'Inter', sans-serif; 
-            margin-top: 10px; /* Añadido para separación entre botones */
+            margin-top: 10px; 
         }
 
         .btn:active {
             transform: translateY(1px);
         }
         
-        /* Botón de limpiar */
+        /* Botón de limpiar (MANTENIDO EN GRIS) */
         .btn-clear {
             background-color: #6c757d;
             color: white;
-            width: 48%;
+            width: 48%; /* Mantiene ancho similar al login */
             margin-top: 0; 
         }
         
@@ -146,17 +160,17 @@
             background-color: #5a6268;
         }
         
-        /* Botón de Registrar/Acceder Carrusel (Anteriormente btn-register) */
+        /* Botón de Registrar/Acceder Carrusel (CAMBIADO A ROJO) */
         .btn-register {
-            background-color: #007bff; /* Nuevo color unificado */
+            background-color: #dc3545; /* CAMBIADO A ROJO PRINCIPAL */
             color: white;
-            width: 48%;
+            width: 48%; /* Mantiene ancho similar al login */
             margin-top: 0; 
-            font-size: 1.1rem; /* Ajustado para consistencia */
+            font-size: 1.1rem; 
         }
 
         .btn-register:hover {
-            background-color: #0056b3; /* Hover del nuevo color */
+            background-color: #c82333; /* Hover del color rojo */
         }
         
         /* Botón de Registro Deshabilitado */
@@ -176,19 +190,23 @@
             margin-bottom: 5px; 
         }
         
-        /* Botón Ver Lista de Turistas */
+        /* Botón Ver Lista de Turistas (CAMBIADO A ROJO) */
         .btn-list {
-            background-color: #17a2b8;
+            background-color: #dc3545; /* CAMBIADO A ROJO PRINCIPAL */
             color: white;
             margin-top: 15px; 
-            width: 100%;
+            
+            /* CÓDIGO AÑADIDO/MODIFICADO PARA CENTRAR */
+            display: block; 
+            width: 60%; 
+            margin-left: auto; 
+            margin-right: auto;
+            /* FIN CÓDIGO CENTRADO */
         }
 
         .btn-list:hover {
-            background-color: #138496;
+            background-color: #c82333; /* Hover del color rojo */
         }
-
-        /* ELIMINADOS ESTILOS .btn-carousel y .btn-carousel:hover */
 
         /* Botones flotantes (top-right-buttons) */
         .top-right-buttons {
@@ -200,20 +218,19 @@
             z-index: 10;
         }
         
+        /* Botón Cerrar Sesión (CAMBIADO A ROJO) */
         .top-right-buttons .btn-logout {
             padding: 8px 12px;
             font-size: 0.9rem;
             font-weight: 600;
             border-radius: 8px;
             width: auto;
-        }
-        
-        .top-right-buttons .btn-logout {
-            background-color: #dc3545;
+            background-color: #dc3545; /* CAMBIADO A ROJO PRINCIPAL */
+            color: white; /* Texto blanco */
         }
 
         .top-right-buttons .btn-logout:hover {
-            background-color: #c82333;
+            background-color: #c82333; /* Hover del color rojo */
         }
 
         /* Mensajes de error/éxito */
@@ -252,7 +269,16 @@
         }
         
         .form-row .form-group {
-            flex: 1; /* Distribuye el espacio equitativamente */
+            flex: 1; 
+        }
+
+  .styled-hr {
+            border: none; /* Elimina el borde por defecto */
+            height: 1px; /* Grosor de la línea */
+            background-color: #dc3545; /* Color rojo principal, a juego con los botones */
+            margin: 18px 0; /* Espacio vertical arriba y abajo */
+            border-radius: 30px; /* Bordes ligeramente redondeados */
+            opacity: 0.5; /* Ligera transparencia */
         }
         
     </style>
@@ -281,8 +307,8 @@
         }; 
 
         const firebaseConfig = typeof __firebase_config !== 'undefined' && JSON.parse(__firebase_config).projectId 
-                                     ? JSON.parse(__firebase_config) 
-                                     : LOCAL_FIREBASE_CONFIG;
+                                         ? JSON.parse(__firebase_config) 
+                                         : LOCAL_FIREBASE_CONFIG;
         
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
         
@@ -359,8 +385,8 @@
         
         async function cerrarSesion() {
             if (!auth) {
-                        showMessage("Autenticación no inicializada.", false);
-                        return;
+                                showMessage("Autenticación no inicializada.", false);
+                                return;
             }
             try {
                 await signOut(auth); 
@@ -378,7 +404,7 @@
         function handleDocumentTypeChange() {
             const tipoDoc = document.getElementById('TipoDocumentoSelect').value;
             const inputDoc = document.getElementById('DNI_Carnet');
-            inputDoc.value = ''; // Limpiamos el campo al cambiar el tipo
+            inputDoc.value = ''; 
             
             if (tipoDoc === 'DNI') {
                 inputDoc.maxLength = 8;
@@ -387,7 +413,7 @@
                 inputDoc.maxLength = 12;
                 inputDoc.placeholder = "Ingresar Carnet de Extranjería (máx. 12)";
             } else {
-                inputDoc.maxLength = 12; // Valor por defecto
+                inputDoc.maxLength = 12; 
                 inputDoc.placeholder = "Ingresar Documento";
             }
         }
@@ -401,7 +427,7 @@
                 otroPaisGroup.style.display = 'block';
             } else {
                 otroPaisGroup.style.display = 'none';
-                document.getElementById('otroPaisInput').value = ''; // Limpiar si se oculta
+                document.getElementById('otroPaisInput').value = ''; 
             }
         }
         
@@ -446,9 +472,9 @@
         
         // Función para validar Edad
         function isValidAge(value) {
-              const age = value.trim();
-              // Debe ser un número, no vacío, y estar entre 1 y 99 (máx 2 dígitos)
-              return isValidDocumentNumber(age) && age.length >= 1 && age.length <= 2 && parseInt(age, 10) > 0;
+             const age = value.trim();
+             // Debe ser un número, no vacío, y estar entre 1 y 99 (máx 2 dígitos)
+             return isValidDocumentNumber(age) && age.length >= 1 && age.length <= 2 && parseInt(age, 10) > 0;
         }
 
         async function registrarTurista() {
@@ -498,7 +524,7 @@
             if (isFieldEmpty(turistaData.Sexo)) camposVacios.push("Sexo");
             
             if (isFieldEmpty(paisOrigen)) {
-                 camposVacios.push("País de Origen");
+                  camposVacios.push("País de Origen");
             } else if (paisOrigen === 'Otro' && isFieldEmpty(otroPais)) {
                 camposVacios.push("Especificar País"); 
             }
@@ -629,10 +655,10 @@
     </div>
 
     <div class="container-box">
-        <h2 class="text-center">¡BIENVENIDO A LA FICHA DE REGISTRO!</h2>
+        <h2 class="text-center">¡Bienvenido a la Ficha De Registro!</h2>
         
         <div id="messageContainer" class="message-box" style="display: none;">
-            </div>
+        </div>
 
         <form id="registroForm">
             <div class="form-group">
@@ -707,11 +733,11 @@
 
             <div class="form-actions">
                 <button type="button" id="btnClear" class="btn btn-clear">Limpiar Campos</button>
-                <button type="button" id="btnRegistrar" class="btn btn-register">Registrar y Acceder al Carrusel 🎠</button>
+                <button type="button" id="btnRegistrar" class="btn btn-register">Registrar</button>
             </div>
             
         </form>
-        
+        <hr class="styled-hr">
         <a href="lista_turistas.html" class="btn btn-list">Ver Lista de Turistas</a>
     </div>
     

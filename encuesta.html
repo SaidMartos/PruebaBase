@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kallpa 3D - Encuesta de Satisfacción</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* BASE DE SITE.CSS (Mantenido para coherencia) */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f0f0; 
+            background-image: url('img/plaza-de-armas-cajamarca.jpg'); /* Fondo de Cajamarca */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
+            position: relative; 
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; 
+            padding: 40px 20px;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(2px);
+            z-index: 0;
+        }
+
+        /* ESTILOS DEL CONTENEDOR PRINCIPAL (Ajustado para la encuesta) */
+        .container-box {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 800px; 
+            box-sizing: border-box;
+            position: relative; 
+            margin: 20px auto;
+            z-index: 1;
+            max-height: 90vh; 
+            overflow-y: auto;
+        }
+
+        h2 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 25px;
+            color: #dc3545; /* Rojo principal */
+            font-size: 2rem;
+            text-transform: uppercase;
+        }
+        
+        /* Estilo para los Indicadores con el nuevo color #EFA5AC */
+        .indicator-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800; 
+            color: white; 
+            background-color: #EFA5AC; /* ¡NUEVO COLOR: Rosa Suave! */
+            font-size: 1.4rem; 
+            margin-top: 35px;
+            margin-bottom: 20px;
+            padding: 12px 15px; 
+            border-radius: 8px; 
+            text-align: left !important; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+        }
+
+        /* Estilos de la tabla para las afirmaciones */
+        .survey-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .survey-table th, .survey-table td {
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+        }
+
+        .survey-table th {
+            background-color: #e9f0f9; 
+            color: #333;
+            font-weight: 600;
+            text-align: center;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+        
+        .survey-table td {
+            font-size: 1rem;
+            color: #444;
+            vertical-align: top;
+        }
+        
+        .survey-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Columna de la pregunta */
+        .question-text {
+            width: 55%;
+            text-align: left !important;
+            font-weight: 600;
+        }
+
+        /* Columna de las respuestas (Radio Buttons) */
+        .response-options {
+            text-align: center;
+            width: 9%;
+        }
+        
+        .response-options input[type="radio"] {
+            transform: scale(1.2);
+            margin: 0;
+            cursor: pointer;
+        }
+
+
+        /* Contenedor de botones de acción (Regresar/Avanzar) */
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-top: 30px;
+            padding: 10px 0;
+        }
+
+        /* Estilos para los botones */
+        .btn {
+            display: inline-block;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            font-family: 'Inter', sans-serif; 
+            width: 50%;
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Botón Regresar (Gris/Secundario) */
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        /* Botón Avanzar (Azul/Primario) */
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        
+    </style>
+</head>
+
+<body>
+    
+    <div class="container-box">
+        <h2 class="text-center">Encuesta de Satisfacción Kallpa 3D</h2>
+        
+        <form id="encuestaForm">
+            
+            
+            <table class="survey-table">
+                <thead>
+                    <tr>
+                        <th class="question-text">Afirmación</th>
+                        <th class="response-options">Siempre (S)</th>
+                        <th class="response-options">Casi Siempre (CS)</th>
+                        <th class="response-options">A Veces (A)</th>
+                        <th class="response-options">Casi Nunca (CN)</th>
+                        <th class="response-options">Nunca (N)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    <tr>
+                        <td colspan="6" class="indicator-subtitle">Indicador 4: Nivel de intención de viaje</td>
+                    </tr>
+                    
+                    <tr>
+                        <td class="question-text">Me gustaría visitar físicamente Cajamarca en un futuro cercano.</td>
+                        <td class="response-options"><input type="radio" name="i4_p1" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i4_p1" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i4_p1" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i4_p1" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i4_p1" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">Estoy dispuesto(a) a planear un viaje turístico a Cajamarca.</td>
+                        <td class="response-options"><input type="radio" name="i4_p2" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i4_p2" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i4_p2" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i4_p2" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i4_p2" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">Consideraría incluir Cajamarca en mis planes de viaje.</td>
+                        <td class="response-options"><input type="radio" name="i4_p3" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i4_p3" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i4_p3" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i4_p3" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i4_p3" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">Si tuviera la oportunidad, viajaría a Cajamarca próximamente.</td>
+                        <td class="response-options"><input type="radio" name="i4_p4" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i4_p4" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i4_p4" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i4_p4" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i4_p4" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">La experiencia virtual influyó positivamente en mis planes de viaje.</td>
+                        <td class="response-options"><input type="radio" name="i4_p5" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i4_p5" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i4_p5" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i4_p5" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i4_p5" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">La ciudad se convirtió en un destino que deseo conocer personalmente.</td>
+                        <td class="response-options"><input type="radio" name="i4_p6" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i4_p6" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i4_p6" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i4_p6" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i4_p6" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">Me interesé por los costos o accesos para visitar Cajamarca.</td>
+                        <td class="response-options"><input type="radio" name="i4_p7" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i4_p7" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i4_p7" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i4_p7" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i4_p7" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">La experiencia despertó un deseo real de visitar la ciudad.</td>
+                        <td class="response-options"><input type="radio" name="i4_p8" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i4_p8" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i4_p8" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i4_p8" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i4_p8" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">Me gustaría conocer personalmente los sitios que vi en la aplicación.</td>
+                        <td class="response-options"><input type="radio" name="i4_p9" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i4_p9" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i4_p9" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i4_p9" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i4_p9" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">Planeo recomendar visitar Cajamarca a mis amigos o familiares.</td>
+                        <td class="response-options"><input type="radio" name="i4_p10" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i4_p10" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i4_p10" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i4_p10" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i4_p10" value="1"></td>
+                    </tr>
+
+                    
+                    <tr>
+                        <td colspan="6" class="indicator-subtitle">Indicador 3: Nivel de interés de turistas</td>
+                    </tr>
+
+                    <tr>
+                        <td class="question-text">Me interesa visitar Cajamarca tras haber probado la experiencia de realidad virtual.</td>
+                        <td class="response-options"><input type="radio" name="i3_p1" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i3_p1" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i3_p1" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i3_p1" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i3_p1" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">La simulación turística despertó mi curiosidad sobre los lugares turísticos de Cajamarca.</td>
+                        <td class="response-options"><input type="radio" name="i3_p2" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i3_p2" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i3_p2" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i3_p2" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i3_p2" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">La experiencia virtual motivó mi deseo de aprender más sobre la cultura cajamarquina.</td>
+                        <td class="response-options"><input type="radio" name="i3_p3" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i3_p3" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i3_p3" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i3_p3" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i3_p3" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">Considero que esta experiencia influye positivamente en mi decisión de viajar.</td>
+                        <td class="response-options"><input type="radio" name="i3_p4" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i3_p4" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i3_p4" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i3_p4" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i3_p4" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">Me siento más atraído/a por Cajamarca que por otros destinos después de la simulación.</td>
+                        <td class="response-options"><input type="radio" name="i3_p5" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i3_p5" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i3_p5" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i3_p5" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i3_p5" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">La aplicación generó expectativas positivas sobre mi posible visita.</td>
+                        <td class="response-options"><input type="radio" name="i3_p6" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i3_p6" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i3_p6" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i3_p6" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i3_p6" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">Cajamarca ahora está dentro de mis opciones de viaje gracias a esta tecnología.</td>
+                        <td class="response-options"><input type="radio" name="i3_p7" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i3_p7" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i3_p7" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i3_p7" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i3_p7" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">Me pareció interesante el contenido turístico mostrado.</td>
+                        <td class="response-options"><input type="radio" name="i3_p8" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i3_p8" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i3_p8" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i3_p8" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i3_p8" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">La interacción con el entorno aumentó mi interés por descubrir esos lugares en persona.</td>
+                        <td class="response-options"><input type="radio" name="i3_p9" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i3_p9" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i3_p9" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i3_p9" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i3_p9" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">Recomendaría esta experiencia a otras personas interesadas en viajar a Cajamarca.</td>
+                        <td class="response-options"><input type="radio" name="i3_p10" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i3_p10" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i3_p10" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i3_p10" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i3_p10" value="1"></td>
+                    </tr>
+
+                    
+                    <tr>
+                        <td colspan="6" class="indicator-subtitle">Indicador 1: Nivel de experiencia inmersiva</td>
+                    </tr>
+
+                    <tr>
+                        <td class="question-text">Me sentí completamente inmerso(a) en el entorno virtual.</td>
+                        <td class="response-options"><input type="radio" name="i1_p1" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i1_p1" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i1_p1" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i1_p1" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i1_p1" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">La experiencia me hizo sentir como si estuviera realmente en Cajamarca.</td>
+                        <td class="response-options"><input type="radio" name="i1_p2" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i1_p2" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i1_p2" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i1_p2" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i1_p2" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">Percibí realismo en las imágenes y sonidos del entorno.</td>
+                        <td class="response-options"><input type="radio" name="i1_p3" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i1_p3" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i1_p3" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i1_p3" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i1_p3" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">La simulación fue tan envolvente que perdí noción del tiempo.</td>
+                        <td class="response-options"><input type="radio" name="i1_p4" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i1_p4" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i1_p4" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i1_p4" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i1_p4" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">Me sentí parte del entorno mostrado en la aplicación.</td>
+                        <td class="response-options"><input type="radio" name="i1_p5" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i1_p5" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i1_p5" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i1_p5" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i1_p5" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">El nivel de detalle de la simulación aumentó mi sensación de presencia.</td>
+                        <td class="response-options"><input type="radio" name="i1_p6" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i1_p6" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i1_p6" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i1_p6" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i1_p6" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">Las respuestas del sistema a mis acciones fueron naturales.</td>
+                        <td class="response-options"><input type="radio" name="i1_p7" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i1_p7" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i1_p7" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i1_p7" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i1_p7" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">La calidad del recorrido virtual superó mis expectativas.</td>
+                        <td class="response-options"><input type="radio" name="i1_p8" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i1_p8" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i1_p8" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i1_p8" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i1_p8" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">La aplicación ofreció una experiencia envolvente y sensorial.</td>
+                        <td class="response-options"><input type="radio" name="i1_p9" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i1_p9" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i1_p9" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i1_p9" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i1_p9" value="1"></td>
+                    </tr>
+                    <tr>
+                        <td class="question-text">La inmersión que viví fue comparable a una experiencia presencial.</td>
+                        <td class="response-options"><input type="radio" name="i1_p10" value="5" required></td>
+                        <td class="response-options"><input type="radio" name="i1_p10" value="4"></td>
+                        <td class="response-options"><input type="radio" name="i1_p10" value="3"></td>
+                        <td class="response-options"><input type="radio" name="i1_p10" value="2"></td>
+                        <td class="response-options"><input type="radio" name="i1_p10" value="1"></td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+
+            <div class="form-actions">
+                <a href="#" class="btn btn-secondary" id="btnRegresar">Regresar</a> 
+                
+                <button type="submit" class="btn btn-primary">Avanzar / Enviar Encuesta</button>
+            </div>
+            
+        </form>
+        
+    </div>
+    
+    <script>
+        // Enlace del botón "Regresar"
+        document.getElementById('btnRegresar').addEventListener('click', function(e) {
+            e.preventDefault();
+            // Redirigir a la página anterior (Ejemplo: el carrusel)
+            window.location.href = 'carrucel.html'; 
+        });
+
+        // NOTA: Aquí iría la lógica JavaScript para el envío de datos a Firebase.
+    </script>
+</body>
+</html>
