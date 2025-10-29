@@ -21,7 +21,7 @@ if (isUnityScene) {
     // Si estamos en una escena 3D (ej: /Modelos 3D/Cuarto_De_Rescate/Cuarto_De_Rescate.html)
     // Necesitamos subir 2 niveles desde la carpeta de la escena para llegar a la raíz.
     // Cuarto_De_Rescate.html sube a Modelos 3D/, luego sube a la raíz (donde está formulario.html)
-    FORM_URL = "../../formulario.html"; 
+    FORM_URL = "../../encuesta.html"; 
     
     // NOTA: Si usaras una ruta absoluta (ej: /formulario.html), funcionaría,
     // pero depende de que se sirva desde un servidor raíz. Usamos rutas relativas.
@@ -29,7 +29,7 @@ if (isUnityScene) {
 } else {
     // Si estamos en carrucel.html (que está en la raíz)
     // El script está en /js/, así que la ruta correcta para salir y llegar a formulario.html es ../
-    FORM_URL = "formulario.html"; 
+    FORM_URL = "encuesta.html"; 
 }
 
 
@@ -74,7 +74,7 @@ function handleReset() {
 
 // FUNCIÓN CLAVE: Maneja el clic en el botón de finalizar
 function handleFinish() {
-    if (!(window.confirm || console.log)('¿Deseas finalizar la interacción y acceder al formulario?')) {
+    if (!(window.confirm || console.log)('¿Deseas finalizar la interacción y acceder a la encuesta?')) {
         return;
     }
     
