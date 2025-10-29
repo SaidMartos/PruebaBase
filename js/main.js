@@ -29,7 +29,7 @@ if (isUnityScene) {
 } else {
     // Si estamos en carrucel.html (que está en la raíz)
     // El script está en /js/, así que la ruta correcta para salir y llegar a formulario.html es ../
-    FORM_URL = "../formulario.html"; 
+    FORM_URL = "formulario.html"; 
 }
 
 
