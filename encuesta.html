@@ -175,12 +175,12 @@
         
         /* Botón Avanzar (Azul/Primario) */
         .btn-primary {
-            background-color: #007bff;
+            background-color: #dc3545;
             color: white;
         }
 
         .btn-primary:hover {
-            background-color: #0056b3;
+            background-color: #721c24;
         }
         
     </style>
@@ -471,22 +471,28 @@
             <div class="form-actions">
                 <a href="#" class="btn btn-secondary" id="btnRegresar">Regresar</a> 
                 
-                <button type="submit" class="btn btn-primary">Avanzar / Enviar Encuesta</button>
+                <button type="submit" class="btn btn-primary" id="btnAvanzar">Avanzar / Enviar Encuesta</button>
             </div>
             
         </form>
         
     </div>
     
-    <script>
-        // Enlace del botón "Regresar"
-        document.getElementById('btnRegresar').addEventListener('click', function(e) {
-            e.preventDefault();
-            // Redirigir a la página anterior (Ejemplo: el carrusel)
-            window.location.href = 'carrucel.html'; 
-        });
+<script>
+        // Enlace del botón "Regresar"
+        document.getElementById('btnRegresar').addEventListener('click', function(e) {
+            e.preventDefault();
+            // Redirigir a la página anterior (Ejemplo: el carrusel)
+            window.location.href = 'carrucel.html'; 
+        });
 
-        // NOTA: Aquí iría la lógica JavaScript para el envío de datos a Firebase.
-    </script>
+        // CAMBIO 2: Agregar lógica JavaScript para redirigir el botón "Avanzar / Enviar Encuesta"
+        document.getElementById('btnAvanzar').addEventListener('click', function() {
+            // Redirigir a formulario.html
+            window.location.href = 'formulario.html'; 
+        });
+
+        // NOTA: Aquí iría la lógica JavaScript para el envío de datos a Firebase (si se quisiera hacer un guardado *antes* de la redirección).
+    </script>
 </body>
 </html>
